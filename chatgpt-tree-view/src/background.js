@@ -16,41 +16,45 @@ import {
 import { logError } from './libs/utils.js'
 
 // --- Caches ---
-let headersCache = new Map(
-    [
-        ["bearer", null],
-        ["deviceId", null],
-        ["languageHeader", 'en-US'], // XYZ - prone to change
-    ]
-)
+let headersCache = new Map([
+    ['bearer', null],
+    ['deviceId', null],
+    ['languageHeader', 'en-US'], // XYZ - prone to change
+])
 
 let conversationsCache = new Map() // key: conversationId, value: title
 
 // --- Event Listeners (from Content Script) ---
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'request-tree') {
-        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-            const activeTab = tabs[0]
-            const url = activeTab.url
+        chrome.tabs.query(
+            { active: true, currentWindow: true },
+            function (tabs) {
+                const activeTab = tabs[0]
+                const url = activeTab.url
 
-            const conversationId = extractConvoIdFromUrl(url)
-            retrieveTreeResponse(conversationId, headersCache).then((treeResponse) => {
-                // Logging
-                // console.log("raw tree")
-                // tree.printTreePreOrder()
-                // tree.sanitize()
-                // console.log("sanitized tree")
-                // tree.printTreePreOrder()
+                const conversationId = extractConvoIdFromUrl(url)
+                retrieveTreeResponse(conversationId, headersCache)
+                    .then((treeResponse) => {
+                        // Logging
+                        // console.log("raw tree")
+                        // tree.printTreePreOrder()
+                        // tree.sanitize()
+                        // console.log("sanitized tree")
+                        // tree.printTreePreOrder()
 
-                // send message to content script to open the tree view
-                console.log('sending message to content script')
-                chrome.tabs.sendMessage(activeTab.id, { action: 'render-tree', treeResponse: treeResponse })
-            }).catch((error) => {
-                logError("Failed to retrieve tree response: ", error)
-            })
-        })
-        
-        
+                        // send message to content script to open the tree view
+                        console.log('sending message to content script')
+                        chrome.tabs.sendMessage(activeTab.id, {
+                            action: 'render-tree',
+                            treeResponse: treeResponse,
+                        })
+                    })
+                    .catch((error) => {
+                        logError('Failed to retrieve tree response: ', error)
+                    })
+            }
+        )
     }
 })
 
@@ -91,10 +95,18 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
 //     }
 // })
 
-chrome.webRequest.onBeforeSendHeaders.addListener((details) => {
-    captureRequestParams(details, headersCache)
-}, { urls: ['<all_urls>'] }, ['requestHeaders'])
+chrome.webRequest.onBeforeSendHeaders.addListener(
+    (details) => {
+        captureRequestParams(details, headersCache)
+    },
+    { urls: ['<all_urls>'] },
+    ['requestHeaders']
+)
 
-chrome.webRequest.onBeforeSendHeaders.addListener((details) => {
-    console.log(details)
-}, { urls: [`${CHATGPT_DOMAIN}${CONVERSATION_ENDPOINT}/*-*-*-*-*`] }, ['requestHeaders'])
+chrome.webRequest.onBeforeSendHeaders.addListener(
+    (details) => {
+        console.log(details)
+    },
+    { urls: [`${CHATGPT_DOMAIN}${CONVERSATION_ENDPOINT}/*-*-*-*-*`] },
+    ['requestHeaders']
+)

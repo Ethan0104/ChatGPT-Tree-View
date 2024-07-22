@@ -44,7 +44,9 @@ function getCookie(cookieName) {
 async function retrieveTreeResponse(conversationId, headersCache) {
     if (!checkIfCanMakeConvoHistoryRequest(headersCache)) {
         // send message to content script to get the headers
-        throw new Error("header cache not ready, because no requests were captured yet.")
+        throw new Error(
+            'header cache not ready, because no requests were captured yet.'
+        )
     }
 
     const response = await makeConvoHistoryRequest(
@@ -57,9 +59,13 @@ async function retrieveTreeResponse(conversationId, headersCache) {
     return responseJson
 }
 
-function makeConvoHistoryRequest(conversationId, bearerToken, deviceId, languageHeader) {
-    const url =
-        `https://chatgpt.com/backend-api/conversation/${conversationId}`
+function makeConvoHistoryRequest(
+    conversationId,
+    bearerToken,
+    deviceId,
+    languageHeader
+) {
+    const url = `https://chatgpt.com/backend-api/conversation/${conversationId}`
     const headers = {
         Authorization: bearerToken,
         'Oai-device-id': deviceId,
@@ -69,7 +75,11 @@ function makeConvoHistoryRequest(conversationId, bearerToken, deviceId, language
 }
 
 function checkIfCanMakeConvoHistoryRequest(headersCache) {
-    return headersCache.bearer && headersCache.deviceId && headersCache.languageHeader
+    return (
+        headersCache.bearer &&
+        headersCache.deviceId &&
+        headersCache.languageHeader
+    )
 }
 
 function captureRequestParams(details, headersCache) {

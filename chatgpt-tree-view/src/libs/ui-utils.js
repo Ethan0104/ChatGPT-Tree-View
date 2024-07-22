@@ -1,19 +1,19 @@
-import React from "react"
-import ReactDOM from "react-dom/client"
-
+import React from 'react'
+import ReactDOM from 'react-dom/client'
 
 function initializeTreeSpace(tree) {
     // hide all the conversation turns
-    const convoTurns = document.querySelectorAll("[data-testid^='conversation-turn-']")
-    console.log("TURNS", convoTurns)
-    convoTurns.forEach(turn => {
-        turn.style.display = "none"
+    const convoTurns = document.querySelectorAll(
+        "[data-testid^='conversation-turn-']"
+    )
+    console.log('TURNS', convoTurns)
+    convoTurns.forEach((turn) => {
+        turn.style.display = 'none'
     })
-
 
     // modify the parent div that will eventually hold the entire tree view
     const convoTurnParent = convoTurns[0].parentNode
-    convoTurnParent.classList.add("h-full")
+    convoTurnParent.classList.add('h-full')
 
     // TEST
     let childId1 = tree.root.childrenIds[0]
@@ -22,9 +22,9 @@ function initializeTreeSpace(tree) {
     let child2 = child1.children[childId2]
 
     // initialize the actual tree view by creating an root element that's on the same level as the conversation turns
-    const root = document.createElement("div")
-    root.id = "chatgpt-tree-view-root"
-    root.classList.add("h-full", "flex-grow")
+    const root = document.createElement('div')
+    root.id = 'chatgpt-tree-view-root'
+    root.classList.add('h-full', 'flex-grow')
     convoTurnParent.appendChild(root)
 
     const rootDiv = ReactDOM.createRoot(root)
@@ -37,6 +37,4 @@ function initializeTreeSpace(tree) {
     rootDiv.render(mainDiv)
 }
 
-export {
-    initializeTreeSpace,
-}
+export { initializeTreeSpace }

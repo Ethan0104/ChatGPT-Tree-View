@@ -56,7 +56,6 @@
 //     }
 // }
 
-
 class ContentPart {
     constructor(type, value, mimeType = null) {
         this.type = type
@@ -65,6 +64,4 @@ class ContentPart {
     }
 }
 
-export {
-    ContentPart,
-}
+export { ContentPart }

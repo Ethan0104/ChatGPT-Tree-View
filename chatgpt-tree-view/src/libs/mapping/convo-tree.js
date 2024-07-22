@@ -23,12 +23,13 @@ export class ConvoTree {
             rootChildrenIds.forEach((id) => {
                 const child = this.rawRoot.children[id]
                 if (!child.isUserMessage()) {
-                    throw new Error("Assertion Error: Root child is not a user message")
+                    throw new Error(
+                        'Assertion Error: Root child is not a user message'
+                    )
                 }
 
                 this.roots.push(new MergedMessage(child, null))
             })
-
 
             // this.root = new Message(root.id, rawMapping, null) // initializing Message objects partially for now
 
@@ -48,22 +49,24 @@ export class ConvoTree {
 
             // // step 4: perform User-Assistant Message Merging
 
-
             // this.currentNodeId = currentNodeId
             // this.currentNode = this.findMessageById(currentNodeId)
 
-            
             // this.renderElementsForAll()
         } catch (error) {
-            logError("Failed to initialize ConvoTree: ", error)
+            logError('Failed to initialize ConvoTree: ', error)
         }
     }
 
     getRoot(rawMapping) {
         const messageIds = Object.keys(rawMapping)
-        const filteredId = messageIds.filter((id) => rawMapping[id].parent === null)
+        const filteredId = messageIds.filter(
+            (id) => rawMapping[id].parent === null
+        )
         if (filteredId.length !== 1) {
-            throw new Error(`Root node number is not 1, found ${filteredId.length}`)
+            throw new Error(
+                `Root node number is not 1, found ${filteredId.length}`
+            )
         }
         return rawMapping[filteredId[0]]
     }

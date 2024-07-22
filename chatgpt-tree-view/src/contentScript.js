@@ -11,7 +11,6 @@ import { ConvoTree } from './libs/mapping/convo-tree.js'
 //     console.log(requests)
 // })
 
-
 // handle the "enter tree view" button
 addTreeButton()
 const observer = new MutationObserver((mutationsList, observer) => {
@@ -28,7 +27,7 @@ const observer = new MutationObserver((mutationsList, observer) => {
 setTimeout(() => {
     observer.observe(document.body, {
         childList: true,
-        subtree: true
+        subtree: true,
     })
 }, 1000)
 
@@ -42,7 +41,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const currentNodeId = treeResponse.current_node
         const tree = new ConvoTree(mapping, currentNodeId)
         tree.printRawTreePreOrder()
-        console.log("DRUM ROLL PLEASE")
+        console.log('DRUM ROLL PLEASE')
         tree.printMergedTreePreOrder()
 
         // initializeTreeSpace(tree)

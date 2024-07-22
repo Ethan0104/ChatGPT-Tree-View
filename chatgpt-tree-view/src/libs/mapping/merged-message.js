@@ -10,12 +10,12 @@ export class MergedMessage {
     constructor(rawUserMessage, parent) {
         this.id = rawUserMessage.id
         this.parent = parent
-        
+
         // load the user message first, the user message is like the root within the tree in this supernode
         try {
             this.userMessageChunks = this.loadUserMessage(rawUserMessage)
         } catch (error) {
-            logError("Failed to load User Message: ", error)
+            logError('Failed to load User Message: ', error)
         }
 
         // explore the paths that stem from the user message (this will have more than one path iff "regenerate" is used)
@@ -23,7 +23,10 @@ export class MergedMessage {
             const childrenIds = rawUserMessage.childrenIds
             const leafMessages = []
             this.assistantBranches = childrenIds.map((childId) => {
-                const rawMessages = this.validateAndExtractLinkedList(rawUserMessage, childId)
+                const rawMessages = this.validateAndExtractLinkedList(
+                    rawUserMessage,
+                    childId
+                )
 
                 // note down the leaf message of this branch while we are at it
                 const lastRawMessage = rawMessages[rawMessages.length - 1]
@@ -34,36 +37,46 @@ export class MergedMessage {
 
             // aggregate the children of the leaf messages
             this.children = []
-            leafMessages.forEach((leafMessage) => { // leafMessage is a RawMessage object
+            leafMessages.forEach((leafMessage) => {
+                // leafMessage is a RawMessage object
                 const leafChildrenIds = leafMessage.childrenIds
                 const leafChildren = leafChildrenIds.map((childId) => {
                     return leafMessage.children[childId]
                 })
-                
+
                 leafChildren.forEach((leafChild) => {
                     if (!leafChild.isUserMessage()) {
-                        throw new Error("Assertion Error: Expected leaf children to be user messages")
+                        throw new Error(
+                            'Assertion Error: Expected leaf children to be user messages'
+                        )
                     }
 
                     this.children.push(new MergedMessage(leafChild, this))
                 })
             })
         } catch (error) {
-            logError("Failed to load (potentially) multiple multipart Assistant Messages: ", error)
+            logError(
+                'Failed to load (potentially) multiple multipart Assistant Messages: ',
+                error
+            )
         }
     }
 
     loadUserMessage(rawUserMessage) {
         const rawParts = rawUserMessage?.content?.parts || []
         const rawAttachments = rawUserMessage?.metadata?.attachments || []
-        
+
         // do a filter for texts only because images will be in the attachments field anyways
-        const filteredRawParts = rawParts.filter((part) => typeof part === 'string')
+        const filteredRawParts = rawParts.filter(
+            (part) => typeof part === 'string'
+        )
         const contentFieldChunks = filteredRawParts.map((part) => {
-            return new ContentPart("text", part)
+            return new ContentPart('text', part)
         })
         const attachmentFieldChunks = rawAttachments.map((attachment) => {
-            const type = attachment.mime_type.includes("image") ? "image" : "file"
+            const type = attachment.mime_type.includes('image')
+                ? 'image'
+                : 'file'
             return new ContentPart(type, attachment.id, attachment.mime_type)
         })
         return attachmentFieldChunks.concat(contentFieldChunks)
@@ -78,7 +91,9 @@ export class MergedMessage {
             if (currentChild.childrenIds.length == 0) {
                 break
             } else if (currentChild.childrenIds.length != 1) {
-                throw new Error("Assertion Error: Expected the assistant response branch to be linear")
+                throw new Error(
+                    'Assertion Error: Expected the assistant response branch to be linear'
+                )
             }
 
             currentChildId = currentChild.childrenIds[0]
@@ -91,19 +106,34 @@ export class MergedMessage {
         const chunks = []
         rawMessages.forEach((rawMessage) => {
             const contentType = rawMessage.content.content_type
-            if (contentType === "text" || contentType === "multimodal_text") {
+            if (contentType === 'text' || contentType === 'multimodal_text') {
                 const parts = rawMessage.content.parts
                 parts.forEach((part) => {
                     if (typeof part === 'string') {
-                        chunks.push(new ContentPart("text", part))
+                        chunks.push(new ContentPart('text', part))
                     } else if (typeof part === 'object') {
-                        chunks.push(new ContentPart("image", part.asset_pointer.replace("file-service://", "")))
+                        chunks.push(
+                            new ContentPart(
+                                'image',
+                                part.asset_pointer.replace(
+                                    'file-service://',
+                                    ''
+                                )
+                            )
+                        )
                     }
                 })
-            } else if (contentType === "execution_output") {
-                chunks.push(new ContentPart("code", [rawMessage.metadata?.aggregate_result?.code || "", rawMessage.content.text]))
+            } else if (contentType === 'execution_output') {
+                chunks.push(
+                    new ContentPart('code', [
+                        rawMessage.metadata?.aggregate_result?.code || '',
+                        rawMessage.content.text,
+                    ])
+                )
             } else {
-                throw new Error(`Unexpected content type when building assistant message chunks: ${contentType}`)
+                throw new Error(
+                    `Unexpected content type when building assistant message chunks: ${contentType}`
+                )
             }
         })
         return chunks
@@ -125,7 +155,8 @@ export class MergedMessage {
     }
 
     deleteChildMessageById(id, recurse) {
-        if (this.childrenIds.includes(id)) { // Base case
+        if (this.childrenIds.includes(id)) {
+            // Base case
             // if the child to delete has children, its children should be bumped up to this level
             const child = this.children[id]
             if (child.childrenIds.length > 0) {
@@ -136,9 +167,12 @@ export class MergedMessage {
             }
 
             // finally, delete this child
-            this.childrenIds = this.childrenIds.filter((childId) => childId !== id)
+            this.childrenIds = this.childrenIds.filter(
+                (childId) => childId !== id
+            )
             delete this.children[id]
-        } else if (recurse) { // Recursive case
+        } else if (recurse) {
+            // Recursive case
             this.childrenIds.forEach((childId) => {
                 this.children[childId].deleteChildMessageById(id, true)
             })
@@ -157,22 +191,28 @@ export class MergedMessage {
     }
 
     beginAssistantMessageMerging() {
-        if (this.author.role === "user") {
-
+        if (this.author.role === 'user') {
         }
     }
 
     mergeSubsequentAssistantMessages() {
-        if (this.author.role === "tool" && this.author.name === "dalle.text2im") {
+        if (
+            this.author.role === 'tool' &&
+            this.author.name === 'dalle.text2im'
+        ) {
             // Perform Dall-E Merging
             if (this.childrenIds.length != 1) {
-                throw new Error("Assertion Error: Expected the dalle message only has one child")
+                throw new Error(
+                    'Assertion Error: Expected the dalle message only has one child'
+                )
             }
 
             const childId = this.childrenIds[0]
             const assistantMessage = this.children[childId]
-            if (assistantMessage.author.role !== "assistant") {
-                throw new Error("Assertion Error: Expected the child of the Dall-E message to be an Assistant message")
+            if (assistantMessage.author.role !== 'assistant') {
+                throw new Error(
+                    'Assertion Error: Expected the child of the Dall-E message to be an Assistant message'
+                )
             }
 
             // do the merge
@@ -180,15 +220,20 @@ export class MergedMessage {
             this.author = assistantMessage.author
             this.meta = assistantMessage.meta
             this.deleteChildMessageById(childId, false)
-        } else if (this.author.role === "assistant" && this.recipient === "python") {
+        } else if (
+            this.author.role === 'assistant' &&
+            this.recipient === 'python'
+        ) {
             // Perform Code Block Merging
             if (this.childrenIds.length != 1) {
-                throw new Error("Assertion Error: Expected the child of the code block message to only have one child")
+                throw new Error(
+                    'Assertion Error: Expected the child of the code block message to only have one child'
+                )
             }
-
-            
         } else {
-            throw new Error("Assertion Error: Unexpected entry message for Assistant Message Merging")
+            throw new Error(
+                'Assertion Error: Unexpected entry message for Assistant Message Merging'
+            )
         }
     }
 
@@ -197,7 +242,8 @@ export class MergedMessage {
     }
 
     renderElementRecurse() {
-        if (this.parent) { // only render if not root
+        if (this.parent) {
+            // only render if not root
             this.initElement()
         }
 
@@ -207,7 +253,13 @@ export class MergedMessage {
     }
 
     printPreOrder() {
-        console.log(`${this.id}\n${JSON.stringify(this.userMessageChunks, null, 2)}\n${JSON.stringify(this.assistantBranches, null, 2)}`)
+        console.log(
+            `${this.id}\n${JSON.stringify(
+                this.userMessageChunks,
+                null,
+                2
+            )}\n${JSON.stringify(this.assistantBranches, null, 2)}`
+        )
         this.children.forEach((child) => {
             child.printPreOrder()
         })

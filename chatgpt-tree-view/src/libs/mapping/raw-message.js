@@ -1,7 +1,7 @@
 class RawMessage {
     constructor(id, rawMapping, parent) {
         const raw = rawMapping[id]
-        
+
         this.id = id
         this.parent = parent
         this.childrenIds = raw.children
@@ -34,7 +34,8 @@ class RawMessage {
     }
 
     deleteChildMessageById(id) {
-        if (this.childrenIds.includes(id)) { // Base case
+        if (this.childrenIds.includes(id)) {
+            // Base case
             // if the child to delete has children, its children should be bumped up to this level
             const child = this.children[id]
             if (child.childrenIds.length > 0) {
@@ -45,9 +46,12 @@ class RawMessage {
             }
 
             // finally, delete this child
-            this.childrenIds = this.childrenIds.filter((childId) => childId !== id)
+            this.childrenIds = this.childrenIds.filter(
+                (childId) => childId !== id
+            )
             delete this.children[id]
-        } else { // Recursive case
+        } else {
+            // Recursive case
             this.childrenIds.forEach((childId) => {
                 this.children[childId].deleteChildMessageById(id, true)
             })
@@ -72,21 +76,28 @@ class RawMessage {
             // obvious
             this.metadata.is_visually_hidden_from_conversation == true ||
             // user memories
-            this.content.content_type === "model_editable_context" ||
+            this.content.content_type === 'model_editable_context' ||
             // file summary
-            this.content.content_type === "tether_quote" ||
+            this.content.content_type === 'tether_quote' ||
             // bio is a message that says memory is updated, and myfiles_browser is same as above, just a file summary
-            (this.author.role === "tool" && (this.author.name === "bio" || this.author.name === "myfiles_browser")) ||
+            (this.author.role === 'tool' &&
+                (this.author.name === 'bio' ||
+                    this.author.name === 'myfiles_browser')) ||
             // system messages
-            this.author.role === "system" ||
+            this.author.role === 'system' ||
             // the prompt for Dall-E sent by the assistant
-            (this.author.role === "assistant" && this.recipient === "dalle.text2im") ||
+            (this.author.role === 'assistant' &&
+                this.recipient === 'dalle.text2im') ||
             // the assistant trying to update memory
-            (this.author.role === "assistant" && this.recipient === "bio") || 
+            (this.author.role === 'assistant' && this.recipient === 'bio') ||
             // dall-e spitting the prompt back
-            (this.author.role === "tool" && this.author.name === "dalle.text2im" && this.content.content_type === "text") ||
+            (this.author.role === 'tool' &&
+                this.author.name === 'dalle.text2im' &&
+                this.content.content_type === 'text') ||
             // assistant sends code to python runner (visible but delete because the execution output message contains the code)
-            (this.author.role === "assistant" && this.recipient === "python" && this.content.content_type === "code")
+            (this.author.role === 'assistant' &&
+                this.recipient === 'python' &&
+                this.content.content_type === 'code')
         ) {
             return true
         }
@@ -94,7 +105,7 @@ class RawMessage {
     }
 
     isUserMessage() {
-        return this.author.role === "user"
+        return this.author.role === 'user'
     }
 
     printPreOrder() {
@@ -105,6 +116,4 @@ class RawMessage {
     }
 }
 
-export {
-    RawMessage,
-}
+export { RawMessage }
