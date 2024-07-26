@@ -1,8 +1,9 @@
 import React from 'react'
 
-import { ContentPart } from './util-models'
-import { MessageBlock } from '../elements/message-block'
+import { ContentPart, CONTENT_PART_TYPES, UserMessage, AssistantReply } from './util-models'
+import { MergedMessageBlock } from '../elements/message-block'
 import { logError } from '../utils'
+import { MODEL_TYPES } from '../../constants/modelTypes'
 
 export class MergedMessage {
     // the class that represents a supernode in the tree:
@@ -13,7 +14,7 @@ export class MergedMessage {
 
         // load the user message first, the user message is like the root within the tree in this supernode
         try {
-            this.userMessageChunks = this.loadUserMessage(rawUserMessage)
+            this.userMessage = this.loadUserMessage(rawUserMessage)
         } catch (error) {
             logError('Failed to load User Message: ', error)
         }
@@ -71,15 +72,16 @@ export class MergedMessage {
             (part) => typeof part === 'string'
         )
         const contentFieldChunks = filteredRawParts.map((part) => {
-            return new ContentPart('text', part)
+            return new ContentPart(CONTENT_PART_TYPES.TEXT, part)
         })
         const attachmentFieldChunks = rawAttachments.map((attachment) => {
             const type = attachment.mime_type.includes('image')
-                ? 'image'
-                : 'file'
+                ? CONTENT_PART_TYPES.IMAGE
+                : CONTENT_PART_TYPES.FILE
             return new ContentPart(type, attachment.id, attachment.mime_type)
         })
-        return attachmentFieldChunks.concat(contentFieldChunks)
+        const combinedChunks = attachmentFieldChunks.concat(contentFieldChunks)
+        return new UserMessage(combinedChunks)
     }
 
     validateAndExtractLinkedList(rawUserMessage, childId) {
@@ -91,11 +93,15 @@ export class MergedMessage {
             if (currentChild.childrenIds.length == 0) {
                 break
             } else if (currentChild.childrenIds.length != 1) {
-                throw new Error(
-                    'Assertion Error: Expected the assistant response branch to be linear'
-                )
+                currentChild.childrenIds.forEach((childId) => {
+                    const child = currentChild.children[childId]
+                    if (!child.isUserMessage()) {
+                        throw new Error(
+                            `Assertion Error: Expected the assistant response branch to be linear, but ${currentChild.id} has ${currentChild.childrenIds.length} children.`
+                        )
+                    }
+                })
             }
-
             currentChildId = currentChild.childrenIds[0]
             currentChild = currentChild.children[currentChildId]
         }
@@ -103,6 +109,7 @@ export class MergedMessage {
     }
 
     buildSingleAssistantMessage(rawMessages) {
+        const modelSlug = this.findModelSlugFromListOfMessages(rawMessages)
         const chunks = []
         rawMessages.forEach((rawMessage) => {
             const contentType = rawMessage.content.content_type
@@ -110,11 +117,11 @@ export class MergedMessage {
                 const parts = rawMessage.content.parts
                 parts.forEach((part) => {
                     if (typeof part === 'string') {
-                        chunks.push(new ContentPart('text', part))
+                        chunks.push(new ContentPart(CONTENT_PART_TYPES.TEXT, part))
                     } else if (typeof part === 'object') {
                         chunks.push(
                             new ContentPart(
-                                'image',
+                                CONTENT_PART_TYPES.IMAGE,
                                 part.asset_pointer.replace(
                                     'file-service://',
                                     ''
@@ -125,10 +132,10 @@ export class MergedMessage {
                 })
             } else if (contentType === 'execution_output') {
                 chunks.push(
-                    new ContentPart('code', [
-                        rawMessage.metadata?.aggregate_result?.code || '',
-                        rawMessage.content.text,
-                    ])
+                    new ContentPart(CONTENT_PART_TYPES.CODE, {
+                        code: rawMessage.metadata?.aggregate_result?.code || '',
+                        result: rawMessage.content.text,
+                    })
                 )
             } else {
                 throw new Error(
@@ -136,7 +143,17 @@ export class MergedMessage {
                 )
             }
         })
-        return chunks
+        return new AssistantReply(chunks, modelSlug)
+    }
+
+    findModelSlugFromListOfMessages(rawMessages) {
+        rawMessages.forEach((rawMessage) => {
+            const modelSlug = rawMessage.metadata?.model_slug
+            if (modelSlug && MODEL_TYPES.includes(modelSlug)) {
+                return modelSlug
+            }
+        })
+        return null
     }
 
     findMessageById(id) {
@@ -155,27 +172,23 @@ export class MergedMessage {
     }
 
     initElement() {
-        this.element = <MessageBlock message={this} />
+        this.element = <MergedMessageBlock message={this} />
     }
 
     renderElementRecurse() {
-        if (this.parent) {
-            // only render if not root
-            this.initElement()
-        }
-
-        this.childrenIds.forEach((childId) => {
-            this.children[childId].renderElementRecurse()
+        this.initElement()
+        this.children.forEach((child) => {
+            child.renderElementRecurse()
         })
     }
 
     printPreOrder() {
         console.log(
-            `${this.id}\n${JSON.stringify(
-                this.userMessageChunks,
+            `User: ${this.id}\n${JSON.stringify(
+                this.userMessage,
                 null,
                 2
-            )}\n${JSON.stringify(this.assistantBranches, null, 2)}`
+            )}\nAssistant: ${JSON.stringify(this.assistantBranches, null, 2)}`
         )
         this.children.forEach((child) => {
             child.printPreOrder()

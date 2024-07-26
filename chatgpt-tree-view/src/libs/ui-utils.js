@@ -16,10 +16,10 @@ function initializeTreeSpace(tree) {
     convoTurnParent.classList.add('h-full')
 
     // TEST
-    let childId1 = tree.root.childrenIds[0]
-    let child1 = tree.root.children[childId1]
-    let childId2 = child1.childrenIds[0]
-    let child2 = child1.children[childId2]
+    let child1 = tree.roots[0]
+    let child2 = tree.roots[0].children[0]
+    console.log('CHILD1', child1)
+    console.log('CHILD2', child2)
 
     // initialize the actual tree view by creating an root element that's on the same level as the conversation turns
     const root = document.createElement('div')

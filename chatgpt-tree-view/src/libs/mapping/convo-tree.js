@@ -8,7 +8,7 @@ export class ConvoTree {
             // here begins the long process of turning the rawMapping into a tree with supernodes.
 
             // step 1: find the root
-            const rootObj = this.getRoot(rawMapping)
+            const rootObj = this.getRawRoot(rawMapping)
 
             // step 2: parse the rawMapping object into a tree of RawMessage objects
             this.rawRoot = new RawMessage(rootObj.id, rawMapping, null)
@@ -31,6 +31,9 @@ export class ConvoTree {
                 this.roots.push(new MergedMessage(child, null))
             })
 
+            // step 5: render the elements for all the supernodes
+            this.renderElementsForAll()
+
             // this.root = new Message(root.id, rawMapping, null) // initializing Message objects partially for now
 
             // // step 2: delete irrelevant Message objects (invisible ones)
@@ -50,7 +53,7 @@ export class ConvoTree {
             // // step 4: perform User-Assistant Message Merging
 
             // this.currentNodeId = currentNodeId
-            // this.currentNode = this.findMessageById(currentNodeId)
+            // this.currentNode = this.findRawMessageById(currentNodeId)
 
             // this.renderElementsForAll()
         } catch (error) {
@@ -58,7 +61,7 @@ export class ConvoTree {
         }
     }
 
-    getRoot(rawMapping) {
+    getRawRoot(rawMapping) {
         const messageIds = Object.keys(rawMapping)
         const filteredId = messageIds.filter(
             (id) => rawMapping[id].parent === null
@@ -71,8 +74,8 @@ export class ConvoTree {
         return rawMapping[filteredId[0]]
     }
 
-    findMessageById(id) {
-        return this.rawRoot.findMessageById(id)
+    findRawMessageById(id) {
+        return this.rawRoot.findRawMessageById(id)
     }
 
     sanitize() {
@@ -84,7 +87,9 @@ export class ConvoTree {
     }
 
     renderElementsForAll() {
-        this.rawRoot.renderElementRecurse()
+        this.roots.forEach((root) => {
+            root.renderElementRecurse()
+        })
     }
 
     printRawTreePreOrder() {

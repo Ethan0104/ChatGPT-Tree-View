@@ -44,6 +44,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log('DRUM ROLL PLEASE')
         tree.printMergedTreePreOrder()
 
-        // initializeTreeSpace(tree)
+        initializeTreeSpace(tree)
     }
 })

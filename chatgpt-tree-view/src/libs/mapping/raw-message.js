@@ -18,14 +18,14 @@ class RawMessage {
         this.recipient = this.message?.recipient // guaranteed to be not null if not root node
     }
 
-    findMessageById(id) {
+    findRawMessageById(id) {
         if (this.id === id) {
             return this
         }
 
         for (let i = 0; i < this.children.length; i++) {
             const child = this.children[i]
-            const result = child.findMessageById(id)
+            const result = child.findRawMessageById(id)
             if (result) {
                 return result
             }

@@ -56,12 +56,37 @@
 //     }
 // }
 
+const CONTENT_PART_TYPES = {
+    TEXT: 'text',
+    CODE: 'code',
+    IMAGE: 'image',
+    FILE: 'file',
+}
+
 class ContentPart {
     constructor(type, value, mimeType = null) {
-        this.type = type
-        this.value = value // string (text or fileId) or list [code, executionOutput]
-        this.mimeType = mimeType
+        this.type = type // one of the CONTENT_PART_TYPES
+        this.value = value // string (text or fileId) or object with keys 'code' and 'result' (for code)
+        this.mimeType = mimeType // mainly used for displaying the icon of the file
     }
 }
 
-export { ContentPart }
+class UserMessage {
+    constructor(chunks) {
+        this.chunks = chunks // array of ContentPart
+    }
+}
+
+class AssistantReply {
+    constructor(chunks, author) {
+        this.chunks = chunks // array of ContentPart
+        this.author = author // the model that generated this reply, one of the elements in MODEL_TYPES
+    }
+}
+
+export {
+    ContentPart,
+    CONTENT_PART_TYPES,
+    UserMessage,
+    AssistantReply,
+}
