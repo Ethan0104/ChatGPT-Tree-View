@@ -1,13 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react'
 
-// const Canvas = () => { // not actually a canvas element
+const PAN_INTENSITY = 2;
+const ZOOM_INTENSITY = 0.03;
+const MIN_SCALE = 0.1;
+const MAX_SCALE = 4;
 
-//     return (
-//         <div id="chatgpt-tree-view-canvas">
-
-//         </div>
-//     )
-// }
 
 const Canvas = ({child1, child2}) => { // not actually a canvas element
     const canvasRef = useRef(null);
@@ -20,9 +17,18 @@ const Canvas = ({child1, child2}) => { // not actually a canvas element
     const [scale, setScale] = useState(1);
     const [initialDistance, setInitialDistance] = useState(null);
 
+    const getMousePosition = (event) => {
+        const parentRect = canvasRef.current.getBoundingClientRect();
+        return {
+            mouseX: event.clientX - parentRect.left,
+            mouseY: event.clientY - parentRect.top,
+        };
+    }
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const parent = parentRef.current;
+        parent.style.transformOrigin = '0 0';
 
         const handleMouseDown = (event) => {
             if (event.button === 1) { // Middle mouse button
@@ -45,36 +51,41 @@ const Canvas = ({child1, child2}) => { // not actually a canvas element
             parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
         };
 
+        const zoomAtXY = (newScale, centerX, centerY) => {
+            // Cap the scale
+            const s = Math.min(Math.max(newScale, MIN_SCALE), MAX_SCALE);
+
+            // Get the position of the center (mouse or canvas center) relative to the parent div
+            const x = centerX - translateX;
+            const y = centerY - translateY;
+
+            // Calculate the new translate values
+            const newTranslateX = translateX + (1 - s / scale) * x
+            const newTranslateY = translateY + (1 - s / scale) * y
+
+            setTranslateX(newTranslateX)
+            setTranslateY(newTranslateY)
+            setScale(s);
+            parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        }
+
         const handleWheel = (event) => {
             if (!canvas.contains(event.target)) return;
-
             event.preventDefault();
 
             if (event.ctrlKey || event.metaKey) {
                 // Zooming
-                const zoomIntensity = 0.01;
                 const scrollDirection = event.deltaY > 0 ? -1 : 1;
 
-                // Get the bounding box of the parent element
-                const parentRect = parent.getBoundingClientRect();
-
-                // Calculate the center point of the canvas relative to the parent element
-                const canvasCenterX = (canvas.clientWidth / 2 - parentRect.left) / scale;
-                const canvasCenterY = (canvas.clientHeight / 2 - parentRect.top) / scale;
-
                 // Calculate the new scale
-                const newScale = scale + scrollDirection * zoomIntensity;
-                if (newScale > 0.1) {
-                    // Adjust the translate values to keep the center of the canvas in focus
-                    setTranslateX(translateX - (canvasCenterX * (newScale - scale)));
-                    setTranslateY(translateY - (canvasCenterY * (newScale - scale)));
-                    setScale(newScale);
-                    parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-                }
+                const newScale = scale + scale * scrollDirection * ZOOM_INTENSITY;
+                
+                const { mouseX, mouseY } = getMousePosition(event);
+                zoomAtXY(newScale, mouseX, mouseY)
             } else {
                 // Panning
-                setTranslateX(translateX - event.deltaX);
-                setTranslateY(translateY - event.deltaY);
+                setTranslateX(translateX - event.deltaX * PAN_INTENSITY);
+                setTranslateY(translateY - event.deltaY * PAN_INTENSITY);
                 parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
             }
         };
@@ -90,18 +101,15 @@ const Canvas = ({child1, child2}) => { // not actually a canvas element
         };
 
         const handleGestureChange = (event) => {
+            // UNTESTED PORTION
             if (!canvas.contains(event.target)) return;
             event.preventDefault();
+
             const newScale = scale * event.scale;
-            if (newScale > 0.1) {
-                const parentRect = parent.getBoundingClientRect();
-                const canvasCenterX = (canvas.clientWidth / 2 - parentRect.left) / scale;
-                const canvasCenterY = (canvas.clientHeight / 2 - parentRect.top) / scale;
-                setTranslateX(translateX - (canvasCenterX * (newScale - scale)));
-                setTranslateY(translateY - (canvasCenterY * (newScale - scale)));
-                setScale(newScale);
-                parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-            }
+            const x = canvas.clientWidth / 2 - translateX;
+            const y = canvas.clientHeight / 2 - translateY;
+
+            zoomAtXY(newScale, x, y)
         };
 
         const handleTouchStart = (event) => {
@@ -124,19 +132,14 @@ const Canvas = ({child1, child2}) => { // not actually a canvas element
                 setTranslateY(touch.clientY - startY);
                 parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
             } else if (event.touches.length === 2) {
+                // UNTESTED PORTION
                 event.preventDefault();
                 const newDistance = getDistance(event.touches[0], event.touches[1]);
                 const zoomFactor = newDistance / initialDistance;
                 const newScale = scale * zoomFactor;
-                if (newScale > 0.1) {
-                    const parentRect = parent.getBoundingClientRect();
-                    const canvasCenterX = (canvas.clientWidth / 2 - parentRect.left) / scale;
-                    const canvasCenterY = (canvas.clientHeight / 2 - parentRect.top) / scale;
-                    setTranslateX(translateX - (canvasCenterX * (newScale - scale)));
-                    setTranslateY(translateY - (canvasCenterY * (newScale - scale)));
-                    setScale(newScale);
-                    parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-                }
+                const x = canvas.clientWidth / 2 - translateX;
+                const y = canvas.clientHeight / 2 - translateY;
+                zoomAtXY(newScale, x, y)
             }
         };
 

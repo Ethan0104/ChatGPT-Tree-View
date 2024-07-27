@@ -14,8 +14,8 @@ const UserMessageDisplay = ({ userMessage }) => {
                 <div dangerouslySetInnerHTML={{ __html: queryProfilePicElement().outerHTML }}></div>
             </div>
             <div className="group/conversation-turn relative flex min-w-0 flex-col flex-col gap-1 md:gap-3">
-                {textChunks.map((textChunk) => (
-                    <div>{textChunk.value}</div>
+                {textChunks.map((textChunk, index) => (
+                    <div key={index}>{textChunk.value}</div>
                 ))}
             </div>
         </div>
@@ -33,8 +33,8 @@ const AssistantMessageDisplay = ({ assistantMessage }) => {
                 <GPT4oAvatar />
             </div>
             <div className="group/conversation-turn relative flex min-w-0 flex-col flex-col gap-1 md:gap-3">
-                {textChunks.map((textChunk) => (
-                    <div>{textChunk.value}</div>
+                {textChunks.map((textChunk, index) => (
+                    <div key={index}>{textChunk.value}</div>
                 ))}
             </div>
         </div>
