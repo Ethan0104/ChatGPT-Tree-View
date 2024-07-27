@@ -1,6 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
+import { Canvas } from './elements/canvas'
+
 function initializeTreeSpace(tree) {
     // hide all the conversation turns
     const convoTurns = document.querySelectorAll(
@@ -28,13 +30,19 @@ function initializeTreeSpace(tree) {
     convoTurnParent.appendChild(root)
 
     const rootDiv = ReactDOM.createRoot(root)
-    const mainDiv = (
-        <div>
-            {child1.element}
-            {child2.element}
-        </div>
-    )
-    rootDiv.render(mainDiv)
+    // const mainDiv = (
+    //     <div>
+    //         {child1.element}
+    //         {child2.element}
+    //     </div>
+    // )
+    // const mainDiv = (
+    //     <>
+    //         <Canvas child1={child1.element} child2={child2.element} />
+    //     </>
+    // )
+    // rootDiv.render(mainDiv)
+    rootDiv.render(<Canvas child1={child1.element} child2={child2.element} />)
 }
 
 export { initializeTreeSpace }

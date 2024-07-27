@@ -46,7 +46,6 @@ function addTreeButton() {
     }
 
     let topRight2ButtonsFlexboxDiv = getTopRight2ButtonsFlexboxDiv()
-    console.log(12456, topRight2ButtonsFlexboxDiv)
 
     function tryAdd() {
         topRight2ButtonsFlexboxDiv = getTopRight2ButtonsFlexboxDiv()
