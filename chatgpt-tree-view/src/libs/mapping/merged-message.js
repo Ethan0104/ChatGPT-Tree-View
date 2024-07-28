@@ -1,6 +1,11 @@
 import React from 'react'
 
-import { ContentPart, CONTENT_PART_TYPES, UserMessage, AssistantReply } from './util-models'
+import {
+    ContentPart,
+    CONTENT_PART_TYPES,
+    UserMessage,
+    AssistantReply,
+} from './util-models'
 import { MergedMessageBlock } from '../elements/message-block'
 import { logError } from '../utils'
 import { MODEL_TYPES } from '../../constants/modelTypes'
@@ -63,6 +68,8 @@ export class MergedMessage {
         }
     }
 
+    // --- SETUP HELPERS ---
+
     loadUserMessage(rawUserMessage) {
         const rawParts = rawUserMessage?.content?.parts || []
         const rawAttachments = rawUserMessage?.metadata?.attachments || []
@@ -117,7 +124,9 @@ export class MergedMessage {
                 const parts = rawMessage.content.parts
                 parts.forEach((part) => {
                     if (typeof part === 'string') {
-                        chunks.push(new ContentPart(CONTENT_PART_TYPES.TEXT, part))
+                        chunks.push(
+                            new ContentPart(CONTENT_PART_TYPES.TEXT, part)
+                        )
                     } else if (typeof part === 'object') {
                         chunks.push(
                             new ContentPart(
@@ -156,6 +165,8 @@ export class MergedMessage {
         return null
     }
 
+    // --- UTILITY FUNCTIONS ---
+
     findMessageById(id) {
         if (this.id === id) {
             return this
@@ -171,6 +182,8 @@ export class MergedMessage {
         return null
     }
 
+    // --- UI STUFF ---
+
     initElement() {
         this.element = <MergedMessageBlock message={this} />
     }
@@ -181,6 +194,8 @@ export class MergedMessage {
             child.renderElementRecurse()
         })
     }
+
+    // --- DEBUGGING ---
 
     printPreOrder() {
         console.log(

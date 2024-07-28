@@ -3,7 +3,6 @@
 import { getConversationHistoryRequests } from './libs/network-utils'
 import { addTreeButton } from './libs/elements/tree-button'
 import { initializeTreeSpace } from './libs/ui-utils'
-import { ConvoTree } from './libs/mapping/convo-tree.js'
 
 // // call the function whenever the user double clicks anywhere
 // document.addEventListener('dblclick', () => {
@@ -39,11 +38,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const treeResponse = request.treeResponse
         const mapping = treeResponse.mapping
         const currentNodeId = treeResponse.current_node
-        const tree = new ConvoTree(mapping, currentNodeId)
-        tree.printRawTreePreOrder()
-        console.log('DRUM ROLL PLEASE')
-        tree.printMergedTreePreOrder()
 
-        initializeTreeSpace(tree)
+        initializeTreeSpace(mapping, currentNodeId)
     }
 })

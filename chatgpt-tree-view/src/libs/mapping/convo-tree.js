@@ -33,29 +33,6 @@ export class ConvoTree {
 
             // step 5: render the elements for all the supernodes
             this.renderElementsForAll()
-
-            // this.root = new Message(root.id, rawMapping, null) // initializing Message objects partially for now
-
-            // // step 2: delete irrelevant Message objects (invisible ones)
-            // this.sanitize()
-            // const rootChildrenIds = this.root.childrenIds
-            // rootChildrenIds.forEach((id) => {
-            //     const child = this.root.children[id]
-            //     if (child.author.role !== "user") {
-            //         throw new Error("Assertion Error: Root child is not a user message")
-            //     }
-            // })
-
-            // // step 3: perform Assistant Message Merging
-            // // Dall-E Merging, and
-            // // Code Block Merging
-
-            // // step 4: perform User-Assistant Message Merging
-
-            // this.currentNodeId = currentNodeId
-            // this.currentNode = this.findRawMessageById(currentNodeId)
-
-            // this.renderElementsForAll()
         } catch (error) {
             logError('Failed to initialize ConvoTree: ', error)
         }
@@ -86,11 +63,25 @@ export class ConvoTree {
         })
     }
 
+    // --- UI STUFF ---
+
     renderElementsForAll() {
         this.roots.forEach((root) => {
             root.renderElementRecurse()
         })
     }
+
+    getElementsAsList() {
+        const result = []
+        const traverse = (merged) => {
+            result.push(merged.element)
+            merged.children.forEach((child) => traverse(child))
+        }
+        this.roots.forEach((root) => traverse(root))
+        return result
+    }
+
+    // --- DEBUGGING ---
 
     printRawTreePreOrder() {
         this.rawRoot.printPreOrder()

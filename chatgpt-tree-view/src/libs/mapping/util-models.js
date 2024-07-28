@@ -84,9 +84,4 @@ class AssistantReply {
     }
 }
 
-export {
-    ContentPart,
-    CONTENT_PART_TYPES,
-    UserMessage,
-    AssistantReply,
-}
+export { ContentPart, CONTENT_PART_TYPES, UserMessage, AssistantReply }
