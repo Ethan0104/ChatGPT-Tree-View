@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
-import { X_GAP, Y_GAP } from '../../constants/treeLayout'
+import { SIBLING_SEPARATION, SUBTREE_SEPARATION } from '../../constants/treeLayout'
+import { reingoldTilford } from '../mapping/reingold-tilford'
 
 // Helper function to calculate subtree dimensions
 function calculateSubtreeDimensions(node, dimensions) {
@@ -13,8 +14,8 @@ function calculateSubtreeDimensions(node, dimensions) {
 
     node.children.forEach((child) => {
         const childDim = calculateSubtreeDimensions(child, dimensions)
-        width = Math.max(width, childDim.width + X_GAP)
-        height += childDim.height + Y_GAP
+        width = Math.max(width, childDim.width + SIBLING_SEPARATION)
+        height += childDim.height + SUBTREE_SEPARATION
     })
 
     return { width, height }
@@ -37,10 +38,10 @@ function calculateInitialPositions(
             child,
             dimensions,
             positions,
-            offsetX + dimensions[node.id].width + X_GAP,
+            offsetX + dimensions[node.id].width + SIBLING_SEPARATION,
             currentY
         )
-        currentY += childDim.height + Y_GAP
+        currentY += childDim.height + SUBTREE_SEPARATION
     })
 }
 
@@ -54,7 +55,7 @@ function calculateTreePositions(rootNodes, dimensions) {
                 : positions[rootNodes[index - 1].id].y +
                   calculateSubtreeDimensions(rootNodes[index - 1], dimensions)
                       .height +
-                  Y_GAP
+                  SUBTREE_SEPARATION
         calculateInitialPositions(root, dimensions, positions, 0, rootOffsetY)
     })
 
@@ -72,10 +73,12 @@ const TreeProvider = ({ children, convoTree }) => {
     useEffect(() => {
         console.log("tree provider", Object.keys(dimensions).length, blocks.length, dimensions)
         if (Object.keys(dimensions).length === blocks.length) {
-            const newPositions = calculateTreePositions(
-                convoTree.roots,
-                dimensions
-            )
+            // const newPositions = calculateTreePositions(
+            //     convoTree.roots,
+            //     dimensions
+            // )
+            const newPositions = reingoldTilford(convoTree.roots, dimensions)
+            console.log("ROOT", convoTree.roots[0])
             console.log("newPositions", newPositions)
             setPositions(newPositions)
         }

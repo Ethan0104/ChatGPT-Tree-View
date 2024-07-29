@@ -47,7 +47,6 @@ const AssistantMessageDisplay = ({ assistantMessage }) => {
 }
 
 const MergedMessageBlock = ({ message }) => {
-    const mergedMessageObject = message
     const id = message.id
     const userMessage = message.userMessage
     const assistantBranches = message.assistantBranches
@@ -71,12 +70,17 @@ const MergedMessageBlock = ({ message }) => {
     }, [positions, id])
 
     useEffect(() => {
-        ref.current.style.transform = `translate(${position.x - dimension.width / 2}px, ${position.y - dimension.height / 2}px)`
+        const offsetPos = {
+            x: position.x,
+            y: position.y - dimension.height / 2,
+        }
+        ref.current.style.transform = `translate(${offsetPos.x}px, ${offsetPos.y}px)`
     }, [position])
 
     return (
         <div
-            className="text-base py-[18px] px-3 md:px-4 md:px-5 lg:px-1 xl:px-5 max-w-[40rem] border-2 rounded-md border-gray-400 absolute"
+            className="text-base py-[18px] px-3 md:px-4 md:px-5 lg:px-1 xl:px-5 border-2 rounded-md border-gray-400 absolute"
+            style={{ width: '40rem' }}
             id={`tree-view-message-${id}`}
             ref={ref}
         >

@@ -10,7 +10,7 @@ import { MergedMessageBlock } from '../elements/message-block'
 import { logError } from '../utils'
 import { MODEL_TYPES } from '../../constants/modelTypes'
 
-export class MergedMessage {
+class MergedMessage {
     // the class that represents a supernode in the tree:
     // it is a collection of 1 user message and (potentially) multiple multipart assistant messages
     constructor(rawUserMessage, parent) {
@@ -182,6 +182,64 @@ export class MergedMessage {
         return null
     }
 
+    // --- TREE UTILS ---
+
+    getRoot() {
+        if (this.parent === null) {
+            return this
+        }
+        return this.parent.getRoot()
+    }
+
+    getAllDescendants() {
+        const descendants = []
+        this.children.forEach((child) => {
+            descendants.push(child)
+            descendants.push(...child.getAllDescendants())
+        })
+        return descendants
+    }
+
+    getLeftSibling() {
+        if (this.parent) {
+            const siblings = this.parent.children
+            const index = siblings.indexOf(this)
+            if (index > 0) {
+                return siblings[index - 1]
+            }
+        }
+        return null
+    }
+
+    getRightSibling() {
+        if (this.parent) {
+            const siblings = this.parent.children
+            const index = siblings.indexOf(this)
+            if (index < siblings.length - 1 && index !== -1) {
+                return siblings[index + 1]
+            }
+        }
+        return null
+    }
+
+    depth() {
+        if (this.parent === null) {
+            return 1 // indexing starts at 1
+        }
+        return this.parent.depth() + 1
+    }
+
+    maxDepth() {
+        // if (this.children.length === 0) {
+        //     return this.depth()
+        // }
+        // return Math.max(...this.children.map((child) => child.maxDepth()))
+        // return 4
+        return Math.max(
+            ...[this.getRoot().depth()].concat(this.getRoot().getAllDescendants().map((child) => child.depth()))
+        )
+    }
+
     // --- UI STUFF ---
 
     initElement() {
@@ -210,3 +268,5 @@ export class MergedMessage {
         })
     }
 }
+
+export { MergedMessage }

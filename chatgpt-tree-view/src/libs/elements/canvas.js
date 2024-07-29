@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react'
 
 const PAN_INTENSITY = 2
-const ZOOM_INTENSITY = 0.03
+const ZOOM_INTENSITY = 0.06
 const MIN_SCALE = 0.1
 const MAX_SCALE = 4
 
