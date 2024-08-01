@@ -38,6 +38,8 @@ export class ConvoTree {
         }
     }
 
+    // --- SETUP ---
+
     getRawRoot(rawMapping) {
         const messageIds = Object.keys(rawMapping)
         const filteredId = messageIds.filter(
@@ -61,6 +63,23 @@ export class ConvoTree {
         messageIdsToDelete.forEach((id) => {
             this.rawRoot.deleteChildMessageById(id)
         })
+    }
+
+    // --- TREE UTILS ---
+    nodeCount() {
+        const traverse = (merged) => {
+            let count = 1
+            merged.children.forEach((child) => {
+                count += traverse(child)
+            })
+            return count
+        }
+
+        let count = 0
+        this.roots.forEach((root) => {
+            count += traverse(root)
+        })
+        return count
     }
 
     // --- UI STUFF ---

@@ -1,8 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react'
 
-import { queryProfilePicElement } from '../elements/profile-pic'
-import { GPT4oAvatar } from '../elements/avatars'
-import { useTreeContext } from '../elements/tree-provider'
+import { queryProfilePicElement } from './profile-pic'
+import { GPT4oAvatar } from './avatars'
+import { useTreeContext } from './tree-provider'
 
 const UserMessageDisplay = ({ userMessage }) => {
     const chunks = userMessage.chunks

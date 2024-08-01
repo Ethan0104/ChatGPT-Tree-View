@@ -1,9 +1,10 @@
-import { SIBLING_SEPARATION, SUBTREE_SEPARATION, LEVEL_SEPARATION } from '../../constants/treeLayout'
+import {
+    SIBLING_SEPARATION,
+    SUBTREE_SEPARATION,
+    LEVEL_SEPARATION,
+} from '../../constants/treeLayout'
 
-function reingoldTilford(
-    roots,
-    dimensions,
-) {
+function reingoldTilford(roots, dimensions) {
     const xOffset = 0
     const yOffset = 0
 
@@ -17,7 +18,11 @@ function reingoldTilford(
         children: roots,
 
         getRoot: () => root,
-        getAllDescendants: () => roots.map((realRoot) => realRoot.getAllDescendants()).flat(),
+        getAllDescendants: () =>
+            roots
+                .map((realRoot) => realRoot.getAllDescendants())
+                .flat()
+                .concat(roots),
         getLeftSibling: () => null,
         getRightSibling: () => null,
 
@@ -36,12 +41,35 @@ function reingoldTilford(
         realRoot.parent = root
     })
 
+    initializePositions(root, positions)
     firstPass(root, positions, dimensions)
-    const xAdjustment = secondPass(positions, globalWidth, root, xOffset, yOffset)
+    const xAdjustment = secondPass(
+        positions,
+        globalWidth,
+        root,
+        xOffset,
+        yOffset
+    )
     thirdPass(positions, root, xAdjustment)
     swapXYForAll(positions)
+    // centerCorrection(positions, dimensions)
+
+    delete positions.root
 
     return positions
+}
+
+function initializePositions(root, positions) {
+    // initialize positions so all of them are not null
+    const allDescendants = root.getAllDescendants().concat([root])
+    allDescendants.forEach((descendant) => {
+        positions[descendant.id] = {
+            x: 0,
+            y: 0,
+            mod: 0,
+            shift: 0,
+        }
+    })
 }
 
 function firstPass(treeNode, positions, dimensions) {
@@ -56,11 +84,9 @@ function firstPass(treeNode, positions, dimensions) {
     let _midpoint = 0.0
 
     if (treeNode.isRoot) {
-        positions[treeNode.id] = {
-            x: getMidpointOfChildren(treeNode, positions),
-            mod: _mod,
-            shift: _shift,
-        }
+        positions[treeNode.id].x = getMidpointOfChildren(treeNode, positions)
+        positions[treeNode.id].mod = _mod
+        positions[treeNode.id].shift = _shift
     } else {
         // First part - assign x and mod values
 
@@ -71,8 +97,13 @@ function firstPass(treeNode, positions, dimensions) {
         if (treeNode.getLeftSibling()) {
             // Non-leftmost node
             const leftSiblingId = treeNode.getLeftSibling().id
-            const collisionAvoidance = dimensions[treeNode.id].height / 2 + dimensions[leftSiblingId].height / 2
-            _x = positions[leftSiblingId].x + collisionAvoidance + SIBLING_SEPARATION
+            const collisionAvoidance =
+                dimensions[treeNode.id].height / 2 +
+                dimensions[leftSiblingId].height / 2
+            _x =
+                positions[leftSiblingId].x +
+                collisionAvoidance +
+                SIBLING_SEPARATION
             if (treeNode.children.length > 0) {
                 _mod = _x - _midpoint
             }
@@ -83,18 +114,18 @@ function firstPass(treeNode, positions, dimensions) {
             }
         }
 
-        positions[treeNode.id] = {
-            x: _x,
-            mod: _mod,
-            shift: _shift,
-        }
+        positions[treeNode.id].x = _x
+        positions[treeNode.id].mod = _mod
+        positions[treeNode.id].shift = positions[treeNode.id].shift || _shift
 
         // Second part - assign shift values due to overlapping subtrees
 
         const parentNode = treeNode.parent
         const treeNodeIndex = parentNode.children.indexOf(treeNode)
         if (treeNodeIndex == -1) {
-            throw new Error('Parent does not contain this node in its children list')
+            throw new Error(
+                'Parent does not contain this node in its children list'
+            )
         }
         if (treeNodeIndex !== 0) {
             for (let i = 0; i < treeNodeIndex; i++) {
@@ -107,8 +138,8 @@ function firstPass(treeNode, positions, dimensions) {
                         leftSubtree,
                         treeNode,
                         i,
-                        treeNodeIndex,
-                    ),
+                        treeNodeIndex
+                    )
                 )
             }
 
@@ -116,11 +147,8 @@ function firstPass(treeNode, positions, dimensions) {
             parentNode.children.forEach((sibling, multiple) => {
                 const id = sibling.id
                 const oldShift = positions[id]?.shift || 0
-                if (Object.keys(positions).includes(id)) {
-                    positions[id].shift = oldShift + (_shift * multiple / treeNodeIndex)
-                } else {
-                    positions[id] = { shift: oldShift + (_shift * multiple / treeNodeIndex) }
-                }
+                positions[id].shift =
+                    oldShift + (_shift * multiple) / treeNodeIndex
             })
         }
     }
@@ -131,8 +159,10 @@ function getMidpointOfChildren(treeNode, positions) {
         const firstChildId = treeNode.children[0].id
         const lastChildId = treeNode.children[treeNode.children.length - 1].id
 
-        const firstChildX = positions[firstChildId].x + positions[firstChildId].shift
-        const lastChildX = positions[lastChildId].x + positions[lastChildId].shift
+        const firstChildX =
+            positions[firstChildId].x + positions[firstChildId].shift
+        const lastChildX =
+            positions[lastChildId].x + positions[lastChildId].shift
         return (firstChildX + lastChildX) / 2
     }
     return 0
@@ -148,33 +178,43 @@ function getSubtreeShift(
     leftCumulativeShift = 0,
     rightCumulativeShift = 0,
     cumulativeShift = 0,
-    initialRun = true,
+    initialRun = true
 ) {
     let newShift = 0.0
 
     if (!initialRun) {
-        let xLeft = (
-            positions[leftSubtree.id].x + positions[leftSubtree.id].shift + leftCumulativeShift
-        )
-        let xRight = (
-            positions[rightSubtree.id].x
-            + positions[rightSubtree.id].shift
-            + rightCumulativeShift
-            + cumulativeShift
-        )
-        const collisionAvoidance = dimensions[leftSubtree.id].height / 2 + dimensions[rightSubtree.id].height / 2
+        let xLeft =
+            positions[leftSubtree.id].x +
+            positions[leftSubtree.id].shift +
+            leftCumulativeShift
+        let xRight =
+            positions[rightSubtree.id].x +
+            positions[rightSubtree.id].shift +
+            rightCumulativeShift +
+            cumulativeShift
+        const collisionAvoidance =
+            dimensions[leftSubtree.id].height / 2 +
+            dimensions[rightSubtree.id].height / 2
         newShift = Math.max(
-            (xLeft + SUBTREE_SEPARATION + collisionAvoidance - xRight) / (1 - leftIndex / rightIndex), 0
+            (xLeft + SUBTREE_SEPARATION + collisionAvoidance - xRight) /
+                (1 - leftIndex / rightIndex),
+            0
         )
 
         // Search for a left sibling of leftSubtree that has children
-        while (leftSubtree && leftSubtree.children.length == 0 && leftSubtree.getLeftSibling()) {
+        while (
+            leftSubtree &&
+            leftSubtree.children.length == 0 &&
+            leftSubtree.getLeftSibling()
+        ) {
             leftSubtree = leftSubtree.getLeftSibling()
         }
 
         // Search for a right sibling of rightSubtree that has children
         while (
-            rightSubtree && rightSubtree.children.length == 0 && rightSubtree.getRightSibling()
+            rightSubtree &&
+            rightSubtree.children.length == 0 &&
+            rightSubtree.getRightSibling()
         ) {
             rightSubtree = rightSubtree.getRightSibling()
         }
@@ -189,10 +229,14 @@ function getSubtreeShift(
             rightSubtree.children[0],
             leftIndex,
             rightIndex,
-            leftCumulativeShift + positions[leftSubtree.id].mod + positions[leftSubtree.id].shift,
-            rightCumulativeShift + positions[rightSubtree.id].mod + positions[rightSubtree.id].shift,
+            leftCumulativeShift +
+                positions[leftSubtree.id].mod +
+                positions[leftSubtree.id].shift,
+            rightCumulativeShift +
+                positions[rightSubtree.id].mod +
+                positions[rightSubtree.id].shift,
             cumulativeShift + newShift,
-            false,
+            false
         )
     }
 
@@ -206,14 +250,18 @@ function secondPass(
     xOffset,
     yOffset,
     cumulativeMod = 0.0,
-    xAdjustment = 0.0,
+    xAdjustment = 0.0
 ) {
     const maxDepth = treeNode.maxDepth()
 
-    const finalX = (
-        positions[treeNode.id].x + positions[treeNode.id].shift + cumulativeMod + xOffset
-    )
-    const finalY = (treeNode.depth() - maxDepth) * (globalWidth + LEVEL_SEPARATION) + yOffset
+    const finalX =
+        positions[treeNode.id].x +
+        positions[treeNode.id].shift +
+        cumulativeMod +
+        xOffset
+    const finalY =
+        (treeNode.depth() - maxDepth) * (globalWidth + LEVEL_SEPARATION) +
+        yOffset
     positions[treeNode.id].x = finalX
     positions[treeNode.id].y = finalY
 
@@ -227,8 +275,10 @@ function secondPass(
                     child,
                     xOffset,
                     yOffset,
-                    cumulativeMod + positions[treeNode.id].mod + positions[treeNode.id].shift,
-                    xAdjustment,
+                    cumulativeMod +
+                        positions[treeNode.id].mod +
+                        positions[treeNode.id].shift,
+                    xAdjustment
                 )
             })
         )
@@ -253,6 +303,19 @@ function swapXYForAll(positions) {
         positions[id].x = y
         positions[id].y = x
     })
-} 
+}
+
+function centerCorrection(positions, dimensions) {
+    const ids = Object.keys(positions)
+    ids.forEach((id) => {
+        if (id === 'root') {
+            return
+        }
+
+        const position = positions[id]
+        const dimension = dimensions[id]
+        position.y -= dimension.height / 2
+    })
+}
 
 export { reingoldTilford }

@@ -6,9 +6,10 @@ const MIN_SCALE = 0.1
 const MAX_SCALE = 4
 
 // not actually a canvas element
-const Canvas = ({ blocks }) => {
+const Canvas = ({ children }) => {
     const canvasRef = useRef(null)
     const parentRef = useRef(null)
+
     const [isPanning, setIsPanning] = useState(false)
     const [startX, setStartX] = useState(0)
     const [startY, setStartY] = useState(0)
@@ -28,7 +29,7 @@ const Canvas = ({ blocks }) => {
     useEffect(() => {
         const canvas = canvasRef.current
         const parent = parentRef.current
-        parent.style.transformOrigin = '0 0' // Set the transform origin to the top left corner
+        parent.style.transformOrigin = '0 0' // Set the transform origin to the top left corner so the maths work out
 
         const handleMouseDown = (event) => {
             if (event.button === 1) {
@@ -202,7 +203,7 @@ const Canvas = ({ blocks }) => {
     return (
         <div className="canvas h-full" ref={canvasRef}>
             <div className="parent h-full" ref={parentRef}>
-                {blocks}
+                {children}
             </div>
         </div>
     )

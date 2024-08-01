@@ -230,13 +230,12 @@ class MergedMessage {
     }
 
     maxDepth() {
-        // if (this.children.length === 0) {
-        //     return this.depth()
-        // }
-        // return Math.max(...this.children.map((child) => child.maxDepth()))
-        // return 4
         return Math.max(
-            ...[this.getRoot().depth()].concat(this.getRoot().getAllDescendants().map((child) => child.depth()))
+            ...[this.getRoot().depth()].concat(
+                this.getRoot()
+                    .getAllDescendants()
+                    .map((child) => child.depth())
+            )
         )
     }
 
