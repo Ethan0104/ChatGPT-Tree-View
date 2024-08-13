@@ -1,4 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react'
+import Markdown from 'react-markdown'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 
 import { queryProfilePicElement } from './profile-pic'
 import { GPT4oAvatar } from './avatars'
@@ -19,9 +22,22 @@ const UserMessageDisplay = ({ userMessage }) => {
                 ></div>
             </div>
             <div className="group/conversation-turn relative flex min-w-0 flex-col flex-col gap-1 md:gap-3">
-                {textChunks.map((textChunk, index) => (
-                    <div key={index}>{textChunk.value}</div>
-                ))}
+                {/* {textChunks.map((textChunk, index) => {
+                    const html = renderMarkdown(textChunk.value)
+                    return (
+                        <div
+                            key={index}
+                            dangerouslySetInnerHTML={{ __html: html }}
+                        ></div>
+                    )
+                })} */}
+                {textChunks.map((textChunk, index) => {
+                    return (
+                        <div key={index} className="text-base">
+                            {textChunk.value}
+                        </div>
+                    )
+                })}
             </div>
         </div>
     )
@@ -38,9 +54,90 @@ const AssistantMessageDisplay = ({ assistantMessage }) => {
                 <GPT4oAvatar />
             </div>
             <div className="group/conversation-turn relative flex min-w-0 flex-col flex-col gap-1 md:gap-3">
-                {textChunks.map((textChunk, index) => (
-                    <div key={index}>{textChunk.value}</div>
-                ))}
+                {/* {textChunks.map((textChunk, index) => {
+                    const html = renderMarkdown(textChunk.value)
+                    return (
+                        <div
+                            key={index}
+                            dangerouslySetInnerHTML={{ __html: html }}
+                        ></div>
+                    )
+                })} */}
+                {textChunks.map((textChunk, index) => {
+                    return (
+                        <div key={index} className="text-base">
+                            {textChunk.value}
+                        </div>
+                    )
+                })}
+            </div>
+        </div>
+    )
+}
+
+const SingularMessageDisplay = ({ message, isUser }) => {
+    const chunks = message.chunks
+
+    const textChunks = chunks.filter((chunk) => chunk.type === 'text')
+
+    return (
+        <div className="mx-auto flex flex-1 gap-4 text-base md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem]">
+            <div className="flex-shrink-0 flex flex-col relative items-end">
+                {isUser ? (
+                    <div
+                        dangerouslySetInnerHTML={{
+                            __html: queryProfilePicElement().outerHTML,
+                        }}
+                    ></div>
+                ) : (
+                    <GPT4oAvatar />
+                )}
+            </div>
+            <div className="group/conversation-turn relative flex min-w-0 flex-col flex-col gap-1 md:gap-3">
+                {textChunks.map((textChunk, index) => {
+                    return (
+                        <div key={index} className="markdown prose">
+                            {/* <Markdown>{textChunk.value}</Markdown> */}
+                            <Markdown
+                                children={textChunk.value}
+                                components={{
+                                    code(props) {
+                                        const {
+                                            children,
+                                            className,
+                                            node,
+                                            ...rest
+                                        } = props
+                                        const match = /language-(\w+)/.exec(
+                                            className || ''
+                                        )
+                                        return match ? (
+                                            <SyntaxHighlighter
+                                                {...rest}
+                                                PreTag="div"
+                                                children={String(
+                                                    children
+                                                ).replace(/\n$/, '')}
+                                                language={match[1]}
+                                                style={atomOneDark}
+                                            />
+                                        ) : (
+                                            <div>
+                                                <div></div>
+                                                <code
+                                                    {...rest}
+                                                    className={className}
+                                                >
+                                                    {children}
+                                                </code>
+                                            </div>
+                                        )
+                                    },
+                                }}
+                            />
+                        </div>
+                    )
+                })}
             </div>
         </div>
     )
@@ -84,9 +181,12 @@ const MergedMessageBlock = ({ message }) => {
             id={`tree-view-message-${id}`}
             ref={ref}
         >
-            <UserMessageDisplay userMessage={userMessage} />
+            {/* <UserMessageDisplay userMessage={userMessage} />
             <hr className="my-3"></hr>
-            <AssistantMessageDisplay assistantMessage={assistantBranches[0]} />
+            <AssistantMessageDisplay assistantMessage={assistantBranches[0]} /> */}
+            <SingularMessageDisplay message={userMessage} isUser />
+            <hr className="my-3"></hr>
+            <SingularMessageDisplay message={assistantBranches[0]} />
         </div>
     )
 }

@@ -1,7 +1,6 @@
 import React from 'react'
 import { getBoxToBoxArrow } from 'curved-arrows'
 
-
 const Arrow = ({ x0, y0, w0, h0, x1, y1, w1, h1 }) => {
     const arrowHeadSize = 9
     const strokeWidth = 2
@@ -43,7 +42,9 @@ const Arrow = ({ x0, y0, w0, h0, x1, y1, w1, h1 }) => {
             }}
         >
             <path
-                d={`M ${sx - minX} ${sy - minY} C ${c1x - minX} ${c1y - minY}, ${c2x - minX} ${c2y - minY}, ${ex - minX} ${ey - minY}`}
+                d={`M ${sx - minX} ${sy - minY} C ${c1x - minX} ${
+                    c1y - minY
+                }, ${c2x - minX} ${c2y - minY}, ${ex - minX} ${ey - minY}`}
                 stroke={color}
                 strokeWidth={strokeWidth}
                 fill="none"
@@ -52,7 +53,9 @@ const Arrow = ({ x0, y0, w0, h0, x1, y1, w1, h1 }) => {
                 points={`0,${-arrowHeadSize} ${
                     arrowHeadSize * 2
                 },0, 0,${arrowHeadSize}`}
-                transform={`translate(${ex - minX}, ${ey - minY}) rotate(${ae})`}
+                transform={`translate(${ex - minX}, ${
+                    ey - minY
+                }) rotate(${ae})`}
                 fill={color}
             />
         </svg>
