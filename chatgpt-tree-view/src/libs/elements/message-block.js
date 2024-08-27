@@ -5,13 +5,7 @@ import { MilkdownEditor } from './editor'
 import { queryProfilePicElement } from './profile-pic'
 import { GPT4oAvatar } from './avatars'
 import { useTreeContext } from './tree-provider'
-import {
-    UserLogo,
-    AssistantLogo,
-    EditIcon,
-    CopyIcon,
-    TrashIcon,
-} from './svgs'
+import { UserLogo, AssistantLogo, EditIcon, CopyIcon, TrashIcon } from './svgs'
 
 const UserMessageDisplay = ({ userMessage }) => {
     const chunks = userMessage.chunks
