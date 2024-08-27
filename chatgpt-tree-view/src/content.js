@@ -1,5 +1,7 @@
 'use strict'
 
+import './content.css'
+
 import { getConversationHistoryRequests } from './libs/network-utils'
 import { addTreeButton } from './libs/elements/tree-button'
 import { initializeTreeSpace } from './libs/ui-utils'

@@ -10,7 +10,7 @@ const config = (env, argv) =>
     merge(common, {
         entry: {
             popup: PATHS.src + '/popup.js',
-            contentScript: PATHS.src + '/contentScript.js',
+            content: PATHS.src + '/content.js',
             background: PATHS.src + '/background.js',
         },
         devtool: argv.mode === 'production' ? false : 'source-map',
@@ -22,6 +22,10 @@ const config = (env, argv) =>
                     use: {
                         loader: 'babel-loader',
                     },
+                },
+                {
+                    test: /\.css$/,
+                    use: ['style-loader', 'css-loader', 'postcss-loader'],
                 },
             ],
         },

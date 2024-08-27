@@ -79,7 +79,7 @@ import './popup.css'
                             },
                             (response) => {
                                 console.log(
-                                    'Current count value passed to contentScript file'
+                                    'Current count value passed to content file'
                                 )
                             }
                         )
