@@ -2,87 +2,32 @@ import React, { useRef, useEffect, useState } from 'react'
 import { MilkdownProvider } from '@milkdown/react'
 
 import { MilkdownEditor } from './editor'
-import { queryProfilePicElement } from './profile-pic'
-import { GPT4oAvatar } from './avatars'
 import { useTreeContext } from './tree-provider'
 import { UserLogo, AssistantLogo, EditIcon, CopyIcon, TrashIcon } from './svgs'
-
-const UserMessageDisplay = ({ userMessage }) => {
-    const chunks = userMessage.chunks
-
-    const textChunks = chunks.filter((chunk) => chunk.type === 'text')
-
-    return (
-        <div className="mx-auto flex flex-1 gap-4 text-base md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem]">
-            <div className="flex-shrink-0 flex flex-col relative items-end">
-                <div
-                    dangerouslySetInnerHTML={{
-                        __html: queryProfilePicElement().outerHTML,
-                    }}
-                ></div>
-            </div>
-            <div className="group/conversation-turn relative flex min-w-0 flex-col gap-1 md:gap-3">
-                {/* {textChunks.map((textChunk, index) => {
-                    const html = renderMarkdown(textChunk.value)
-                    return (
-                        <div
-                            key={index}
-                            dangerouslySetInnerHTML={{ __html: html }}
-                        ></div>
-                    )
-                })} */}
-                {textChunks.map((textChunk, index) => {
-                    return (
-                        <div key={index} className="text-base">
-                            {textChunk.value}
-                        </div>
-                    )
-                })}
-            </div>
-        </div>
-    )
-}
-
-const AssistantMessageDisplay = ({ assistantMessage }) => {
-    const chunks = assistantMessage.chunks
-
-    const textChunks = chunks.filter((chunk) => chunk.type === 'text')
-
-    return (
-        <div className="mx-auto flex flex-1 gap-4 text-base md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem]">
-            <div className="flex-shrink-0 flex flex-col relative items-end">
-                <GPT4oAvatar />
-            </div>
-            <div className="group/conversation-turn relative flex min-w-0 flex-col gap-1 md:gap-3">
-                {/* {textChunks.map((textChunk, index) => {
-                    const html = renderMarkdown(textChunk.value)
-                    return (
-                        <div
-                            key={index}
-                            dangerouslySetInnerHTML={{ __html: html }}
-                        ></div>
-                    )
-                })} */}
-                {textChunks.map((textChunk, index) => {
-                    return (
-                        <div key={index} className="text-base">
-                            {textChunk.value}
-                        </div>
-                    )
-                })}
-            </div>
-        </div>
-    )
-}
 
 const SingularMessageDisplay = ({ message, isUser }) => {
     const chunks = message.chunks
 
     const textChunks = chunks.filter((chunk) => chunk.type === 'text')
 
+    const [hovered, setHovered] = useState(false)
+    const ref = useRef(null)
+
+    const handleMouseEnter = () => {
+        setHovered(true)
+    }
+
+    const handleMouseLeave = () => {
+        setHovered(false)
+    }
+
+    useEffect(() => {
+        ref.current.style.cursor = hovered ? 'text' : 'default'
+    })
+
     return (
         <div className="w-full mx-auto flex flex-1 gap-4 text-base bg-dark-textChunkBackground p-4 md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] rounded-md">
-            <div className="group/conversation-turn relative flex min-w-0 flex-col gap-1 md:gap-3">
+            <div className="w-full group/conversation-turn relative flex min-w-0 flex-col gap-1 md:gap-3" ref={ref} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
                 {textChunks.map((textChunk, index) => {
                     return (
                         <MilkdownProvider>
@@ -97,6 +42,7 @@ const SingularMessageDisplay = ({ message, isUser }) => {
 
 const SmallButton = ({ children }) => {
     const [hovered, setHovered] = useState(false)
+    const buttonRef = useRef(null)
 
     const handleMouseEnter = () => {
         setHovered(true)
@@ -106,11 +52,16 @@ const SmallButton = ({ children }) => {
         setHovered(false)
     }
 
+    useEffect(() => {
+        buttonRef.current.style.cursor = hovered ? 'pointer' : 'default'
+    }, [hovered])
+
     return (
         <div
             className="rounded-lg transition-all hover:bg-neutral-800 p-1"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            ref={buttonRef}
         >
             {children}
         </div>
@@ -167,6 +118,20 @@ const MergedMessageBlock = ({ message }) => {
 
     const { positions, setPositions, dimensions, setDimensions } =
         useTreeContext()
+    
+    const [hovered, setHovered] = useState(false)
+
+    const handleMouseEnter = () => {
+        setHovered(true)
+    }
+
+    const handleMouseLeave = () => {
+        setHovered(false)
+    }
+
+    useEffect(() => {
+        ref.current.style.cursor = hovered ? 'grab' : 'default'
+    }, [hovered])
 
     useEffect(() => {
         const container = ref.current
@@ -204,10 +169,12 @@ const MergedMessageBlock = ({ message }) => {
 
     return (
         <div
-            className="flex flex-col gap-3 text-base py-[18px] px-3 md:px-4 lg:px-1 xl:px-5 border-2 bg-dark-blockBackground rounded-3xl border-gray-200 absolute shadow-xl shadow-dark-shadow"
+            className="flex flex-col gap-3 text-base py-[18px] px-3 md:px-4 lg:px-1 xl:px-5 border-2 bg-dark-blockBackground rounded-[36px] border-gray-200 absolute shadow-xl shadow-dark-shadow"
             style={{
                 width: '40rem',
             }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
             id={`tree-view-message-${id}`}
             ref={ref}
         >

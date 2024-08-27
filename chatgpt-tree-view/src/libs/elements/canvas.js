@@ -18,39 +18,20 @@ const Canvas = ({ children }) => {
     const [scale, setScale] = useState(1)
     const [initialDistance, setInitialDistance] = useState(null)
 
-    const getMousePosition = (event) => {
-        const parentRect = canvasRef.current.getBoundingClientRect()
-        return {
-            mouseX: event.clientX - parentRect.left,
-            mouseY: event.clientY - parentRect.top,
-        }
-    }
-
+    
     useEffect(() => {
         const canvas = canvasRef.current
         const parent = parentRef.current
         parent.style.transformOrigin = '0 0' // Set the transform origin to the top left corner so the maths work out
+        
+        let wheelEventEndTimeout = null // for detecting end of wheel event
 
-        const handleMouseDown = (event) => {
-            if (event.button === 1) {
-                // Middle mouse button
-                setIsPanning(true)
-                setStartX(event.clientX - translateX)
-                setStartY(event.clientY - translateY)
-                canvas.style.cursor = 'grabbing'
+        const getMousePosition = (event) => {
+            const parentRect = canvasRef.current.getBoundingClientRect()
+            return {
+                mouseX: event.clientX - parentRect.left,
+                mouseY: event.clientY - parentRect.top,
             }
-        }
-
-        const handleMouseUp = () => {
-            setIsPanning(false)
-            canvas.style.cursor = 'grab'
-        }
-
-        const handleMouseMove = (event) => {
-            if (!isPanning) return
-            setTranslateX(event.clientX - startX)
-            setTranslateY(event.clientY - startY)
-            parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`
         }
 
         const zoomAtXY = (newScale, centerX, centerY) => {
@@ -70,6 +51,28 @@ const Canvas = ({ children }) => {
             setScale(s)
             parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`
         }
+
+        const handleMouseDown = (event) => {
+            // for mouse users
+            if (event.button === 1) {
+                // Middle mouse button
+                setIsPanning(true)
+                setStartX(event.clientX - translateX)
+                setStartY(event.clientY - translateY)
+            }
+        }
+
+        const handleMouseUp = () => {
+            setIsPanning(false)
+        }
+
+        const handleMouseMove = (event) => {
+            if (!isPanning) return
+            setTranslateX(event.clientX - startX)
+            setTranslateY(event.clientY - startY)
+            parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`
+        }
+
 
         const handleWheel = (event) => {
             if (!canvas.contains(event.target)) return
@@ -95,7 +98,6 @@ const Canvas = ({ children }) => {
 
         const handleMouseLeave = () => {
             setIsPanning(false)
-            canvas.style.cursor = 'grab'
         }
 
         const handleGestureStart = (event) => {
@@ -121,7 +123,6 @@ const Canvas = ({ children }) => {
                 const touch = event.touches[0]
                 setStartX(touch.clientX - translateX)
                 setStartY(touch.clientY - translateY)
-                canvas.style.cursor = 'grabbing'
             } else if (event.touches.length === 2) {
                 setIsPanning(false)
                 setInitialDistance(
@@ -153,7 +154,7 @@ const Canvas = ({ children }) => {
 
         const handleTouchEnd = () => {
             setIsPanning(false)
-            canvas.style.cursor = 'grab'
+            canvas.style.cursor = 'default'
         }
 
         const getDistance = (touch1, touch2) => {
