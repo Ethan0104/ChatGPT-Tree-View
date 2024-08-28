@@ -38,7 +38,7 @@ const Arrow = ({ x0, y0, w0, h0, x1, y1, w1, h1 }) => {
             xmlns="http://www.w3.org/2000/svg"
             style={{
                 transform: `translate(${minX}px, ${minY}px)`,
-                zIndex: 999,
+                zIndex: 0,
             }}
         >
             <path

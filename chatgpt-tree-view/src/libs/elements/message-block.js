@@ -3,6 +3,7 @@ import { MilkdownProvider } from '@milkdown/react'
 
 import { MilkdownEditor } from './editor'
 import { useTreeContext } from './tree-provider'
+import { useCanvasContext } from './canvas-provider'
 import { UserLogo, AssistantLogo, EditIcon, CopyIcon, TrashIcon } from './svgs'
 
 const SingularMessageDisplay = ({ message, isUser }) => {
@@ -124,8 +125,17 @@ const MergedMessageBlock = ({ message }) => {
     const [position, setPosition] = useState({ x: 0, y: 0 })
     const [dimension, setDimension] = useState({ width: 0, height: 0 })
 
-    const { positions, setPositions, dimensions, setDimensions } =
-        useTreeContext()
+    const {
+        positions,
+        setPositions,
+        dimensions,
+        setDimensions,
+        setHighestZIndex,
+        zIndices,
+        setZIndices,
+    } = useTreeContext()
+
+    const { scale } = useCanvasContext()
 
     const [hovered, setHovered] = useState(false)
 
@@ -178,6 +188,11 @@ const MergedMessageBlock = ({ message }) => {
     const handleDragStart = (event) => {
         event.stopPropagation()
         event.preventDefault()
+        setHighestZIndex((prevZIndex) => {
+            const newZIndex = prevZIndex + 1
+            setZIndices({ ...zIndices, [id]: newZIndex })
+            return newZIndex
+        })
         const startX = event.clientX
         const startY = event.clientY
 
@@ -185,8 +200,8 @@ const MergedMessageBlock = ({ message }) => {
             const deltaX = event.clientX - startX
             const deltaY = event.clientY - startY
             const newPosition = {
-                x: position.x + deltaX * 0.35,
-                y: position.y + deltaY * 0.35,
+                x: position.x + deltaX / scale,
+                y: position.y + deltaY / scale,
             }
             setPosition(newPosition)
             setPositions((prev) => ({ ...prev, [id]: newPosition }))
@@ -206,6 +221,7 @@ const MergedMessageBlock = ({ message }) => {
             className="flex flex-col gap-3 text-base py-[18px] px-4 border-2 bg-dark-blockBackground rounded-[36px] border-gray-200 absolute shadow-xl shadow-dark-shadow"
             style={{
                 width: '40rem',
+                zIndex: zIndices[id],
             }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}

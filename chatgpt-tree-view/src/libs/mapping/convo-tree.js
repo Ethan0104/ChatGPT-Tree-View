@@ -100,6 +100,16 @@ export class ConvoTree {
         return result
     }
 
+    getMergedMessageIdsAsList() {
+        const result = []
+        const traverse = (merged) => {
+            result.push(merged.id)
+            merged.children.forEach((child) => traverse(child))
+        }
+        this.roots.forEach((root) => traverse(root))
+        return result
+    }
+
     // --- DEBUGGING ---
 
     printRawTreePreOrder() {

@@ -202,14 +202,11 @@ const Canvas = ({ children }) => {
         setIsPanning(false)
     }, [setIsPanning])
 
-    const handleGestureStart = useCallback(
-        (event) => {
-            const canvas = canvasRef.current
-            if (!canvas.contains(event.target)) return
-            event.preventDefault()
-        },
-        []
-    )
+    const handleGestureStart = useCallback((event) => {
+        const canvas = canvasRef.current
+        if (!canvas.contains(event.target)) return
+        event.preventDefault()
+    }, [])
 
     const handleGestureChange = useCallback(
         (event) => {
