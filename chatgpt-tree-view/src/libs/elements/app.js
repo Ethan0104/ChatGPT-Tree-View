@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { CanvasProvider, useCanvasContext } from './canvas-provider'
 import { Canvas } from './canvas'
 import { TreeProvider } from './tree-provider'
 import { TreeContainer } from './tree-container'
@@ -10,9 +11,11 @@ const App = ({ convoTree }) => {
     return (
         <TreeProvider convoTree={convoTree}>
             {/* everything that's pannable/zoomable goes inside this canvas */}
-            <Canvas>
-                <TreeContainer convoTree={convoTree} />
-            </Canvas>
+            <CanvasProvider>
+                <Canvas>
+                    <TreeContainer convoTree={convoTree} />
+                </Canvas>
+            </CanvasProvider>
 
             {/* static things */}
         </TreeProvider>

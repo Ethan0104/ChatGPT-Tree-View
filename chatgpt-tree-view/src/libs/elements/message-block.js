@@ -28,7 +28,7 @@ const SingularMessageDisplay = ({ message, isUser }) => {
     return (
         <div
             className="w-full mx-auto flex flex-1 gap-4 text-base bg-dark-textChunkBackground p-4 md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] max-h-[50rem] overflow-auto rounded-md overscroll-contain"
-            name="singular-message-display"  // for canvas to find this
+            name="singular-message-display" // for canvas to find this
         >
             <div
                 className="w-full group/conversation-turn relative flex min-w-0 flex-col gap-1 md:gap-3 overscroll-contain"
@@ -175,6 +175,32 @@ const MergedMessageBlock = ({ message }) => {
         ref.current.style.transform = `translate(${offsetPos.x}px, ${offsetPos.y}px)`
     }, [position])
 
+    const handleDragStart = (event) => {
+        event.stopPropagation()
+        event.preventDefault()
+        const startX = event.clientX
+        const startY = event.clientY
+
+        const handleDragMove = (event) => {
+            const deltaX = event.clientX - startX
+            const deltaY = event.clientY - startY
+            const newPosition = {
+                x: position.x + deltaX * 0.35,
+                y: position.y + deltaY * 0.35,
+            }
+            setPosition(newPosition)
+            setPositions((prev) => ({ ...prev, [id]: newPosition }))
+        }
+
+        const handleDragEnd = () => {
+            document.removeEventListener('mousemove', handleDragMove)
+            document.removeEventListener('mouseup', handleDragEnd)
+        }
+
+        document.addEventListener('mousemove', handleDragMove)
+        document.addEventListener('mouseup', handleDragEnd)
+    }
+
     return (
         <div
             className="flex flex-col gap-3 text-base py-[18px] px-4 border-2 bg-dark-blockBackground rounded-[36px] border-gray-200 absolute shadow-xl shadow-dark-shadow"
@@ -185,6 +211,7 @@ const MergedMessageBlock = ({ message }) => {
             onMouseLeave={handleMouseLeave}
             id={`tree-view-message-${id}`}
             ref={ref}
+            onMouseDown={handleDragStart}
         >
             <UserMessageMenu />
             <SingularMessageDisplay message={userMessage} isUser />

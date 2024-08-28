@@ -1,7 +1,9 @@
 function getTopRight2ButtonsFlexboxDiv() {
     try {
         // XYZ - prone to change
-        const largeViewDiv = document.querySelector('[data-testid="profile-button"]').parentNode
+        const largeViewDiv = document.querySelector(
+            '[data-testid="profile-button"]'
+        ).parentNode
         const smallViewDiv = document.querySelector(
             '#__next > div.relative.z-0.flex.h-full.w-full.overflow-hidden > div > div.sticky.top-0.z-10.flex.min-h-\\[40px\\].items-center.justify-center.border-b.border-token-border-medium.bg-token-main-surface-primary.pl-1.juice\\:min-h-\\[60px\\].juice\\:border-transparent.juice\\:pl-0.md\\:hidden > div.absolute.bottom-0.right-0.top-0.inline-flex.items-center.juice\\:justify-center'
         ) // not working

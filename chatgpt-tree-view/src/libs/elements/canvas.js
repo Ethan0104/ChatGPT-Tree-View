@@ -1,4 +1,6 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useCallback } from 'react'
+
+import { useCanvasContext } from './canvas-provider'
 
 const PAN_INTENSITY = 2
 const ZOOM_INTENSITY = 0.06
@@ -10,55 +12,77 @@ const Canvas = ({ children }) => {
     const canvasRef = useRef(null)
     const parentRef = useRef(null)
 
-    const [isPanning, setIsPanning] = useState(false)
-    const [startX, setStartX] = useState(0)
-    const [startY, setStartY] = useState(0)
-    const [translateX, setTranslateX] = useState(0)
-    const [translateY, setTranslateY] = useState(0)
-    const [scale, setScale] = useState(1)
-    const [initialDistance, setInitialDistance] = useState(null)
+    const {
+        isPanning,
+        setIsPanning,
+        startX,
+        setStartX,
+        startY,
+        setStartY,
+        translateX,
+        setTranslateX,
+        translateY,
+        setTranslateY,
+        scale,
+        setScale,
+        initialDistance,
+        setInitialDistance,
+    } = useCanvasContext()
 
-    useEffect(() => {
-        const canvas = canvasRef.current
+    let wheelEndTimeout = null
+
+    // Memoized functions
+    const applyTransform = useCallback(() => {
         const parent = parentRef.current
-        parent.style.transformOrigin = '0 0' // Set the transform origin to the top left corner so the maths work out
+        parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`
+    }, [translateX, translateY, scale])
 
-        let wheelEndTimeout = null
+    const zoomAtXY = useCallback(
+        (newScale, centerX, centerY) => {
+            const s = Math.min(Math.max(newScale, MIN_SCALE), MAX_SCALE)
+            const x = centerX - translateX
+            const y = centerY - translateY
 
-        const getMousePosition = (event) => {
+            const newTranslateX = translateX + (1 - s / scale) * x
+            const newTranslateY = translateY + (1 - s / scale) * y
+
+            setTranslateX(newTranslateX)
+            setTranslateY(newTranslateY)
+            setScale(s)
+            applyTransform()
+        },
+        [
+            translateX,
+            translateY,
+            scale,
+            setTranslateX,
+            setTranslateY,
+            setScale,
+            MIN_SCALE,
+            MAX_SCALE,
+            applyTransform,
+        ]
+    )
+
+    const getMousePosition = useCallback(
+        (event) => {
             const parentRect = canvasRef.current.getBoundingClientRect()
             return {
                 mouseX: event.clientX - parentRect.left,
                 mouseY: event.clientY - parentRect.top,
             }
-        }
+        },
+        []
+    )
 
-        const getDistance = (touch1, touch2) => {
-            const dx = touch2.clientX - touch1.clientX
-            const dy = touch2.clientY - touch1.clientY
-            return Math.sqrt(dx * dx + dy * dy)
-        }
+    const getDistance = useCallback((touch1, touch2) => {
+        const dx = touch2.clientX - touch1.clientX
+        const dy = touch2.clientY - touch1.clientY
+        return Math.sqrt(dx * dx + dy * dy)
+    }, [])
 
-        const zoomAtXY = (newScale, centerX, centerY) => {
-            // Cap the scale
-            const s = Math.min(Math.max(newScale, MIN_SCALE), MAX_SCALE)
-
-            // Get the position of the center (mouse or canvas center) relative to the parent div
-            const x = centerX - translateX
-            const y = centerY - translateY
-
-            // Calculate the new translate values
-            const newTranslateX = translateX + (1 - s / scale) * x
-            const newTranslateY = translateY + (1 - s / scale) * y
-
-            console.log("zoomAtXY", newTranslateX, newTranslateY)
-            setTranslateX(newTranslateX)
-            setTranslateY(newTranslateY)
-            setScale(s)
-            parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`
-        }
-
-        const handleMouseDown = (event) => {
+    const handleMouseDown = useCallback(
+        (event) => {
             // for mouse users
             if (event.button === 1) {
                 // Middle mouse button
@@ -66,25 +90,38 @@ const Canvas = ({ children }) => {
                 setStartX(event.clientX - translateX)
                 setStartY(event.clientY - translateY)
             }
-        }
+        },
+        [setIsPanning, setStartX, setStartY, translateX, translateY]
+    )
 
-        const handleMouseUp = () => {
-            // for mouse users
-            setIsPanning(false)
-        }
+    const handleMouseUp = useCallback(() => {
+        // for mouse users
+        setIsPanning(false)
+    }, [setIsPanning])
 
-        const handleMouseMove = (event) => {
+    const handleMouseMove = useCallback(
+        (event) => {
             // for mouse users
             if (!isPanning) return
             if (event.button !== 1) return
 
             setTranslateX(event.clientX - startX)
             setTranslateY(event.clientY - startY)
-            parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`
-        }
+            applyTransform()
+        },
+        [
+            isPanning,
+            setTranslateX,
+            setTranslateY,
+            startX,
+            startY,
+            applyTransform,
+        ]
+    )
 
-        const handleWheel = (event) => {
-            // console.log(event)
+    const handleWheel = useCallback(
+        (event) => {
+            const canvas = canvasRef.current
             if (!canvas.contains(event.target)) {
                 return
             }
@@ -107,11 +144,12 @@ const Canvas = ({ children }) => {
                 const findScrollableParent = (element) => {
                     let parent = element
                     while (parent && parent !== document.body) {
-                        const overflowY = window.getComputedStyle(parent).overflowY
+                        const overflowY =
+                            window.getComputedStyle(parent).overflowY
                         const isScrollable =
                             (overflowY === 'auto' || overflowY === 'scroll') &&
                             parent.scrollHeight > parent.clientHeight
-    
+
                         if (isScrollable) {
                             return parent
                         }
@@ -122,7 +160,6 @@ const Canvas = ({ children }) => {
 
                 // Find the nearest scrollable ancestor
                 const scrollableParent = findScrollableParent(event.target)
-                // console.log(scrollableParent)
 
                 // Prevent default behavior only if no scrollable parent is found
                 if (
@@ -146,21 +183,41 @@ const Canvas = ({ children }) => {
 
                 setTranslateX(translateX - event.deltaX * PAN_INTENSITY)
                 setTranslateY(translateY - event.deltaY * PAN_INTENSITY)
-                parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`
+                applyTransform()
             }
-        }
+        },
+        [
+            scale,
+            getMousePosition,
+            zoomAtXY,
+            isPanning,
+            setIsPanning,
+            setTranslateX,
+            setTranslateY,
+            translateX,
+            translateY,
+            applyTransform,
+            PAN_INTENSITY,
+        ]
+    )
 
-        const handleMouseLeave = () => {
-            setIsPanning(false)
-        }
+    const handleMouseLeave = useCallback(() => {
+        setIsPanning(false)
+    }, [setIsPanning])
 
-        const handleGestureStart = (event) => {
+    const handleGestureStart = useCallback(
+        (event) => {
+            const canvas = canvasRef.current
             if (!canvas.contains(event.target)) return
             event.preventDefault()
-        }
+        },
+        []
+    )
 
-        const handleGestureChange = (event) => {
+    const handleGestureChange = useCallback(
+        (event) => {
             // UNTESTED PORTION
+            const canvas = canvasRef.current
             if (!canvas.contains(event.target)) return
             event.preventDefault()
 
@@ -169,9 +226,12 @@ const Canvas = ({ children }) => {
             const y = canvas.clientHeight / 2 - translateY
 
             zoomAtXY(newScale, x, y)
-        }
+        },
+        [scale, translateX, translateY, zoomAtXY]
+    )
 
-        const handleTouchStart = (event) => {
+    const handleTouchStart = useCallback(
+        (event) => {
             if (event.touches.length === 1) {
                 setIsPanning(true)
                 const touch = event.touches[0]
@@ -183,14 +243,26 @@ const Canvas = ({ children }) => {
                     getDistance(event.touches[0], event.touches[1])
                 )
             }
-        }
+        },
+        [
+            setIsPanning,
+            setStartX,
+            setStartY,
+            translateX,
+            translateY,
+            setInitialDistance,
+            getDistance,
+        ]
+    )
 
-        const handleTouchMove = (event) => {
+    const handleTouchMove = useCallback(
+        (event) => {
+            const canvas = canvasRef.current
             if (isPanning && event.touches.length === 1) {
                 const touch = event.touches[0]
                 setTranslateX(touch.clientX - startX)
                 setTranslateY(touch.clientY - startY)
-                parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`
+                applyTransform()
             } else if (event.touches.length === 2) {
                 // UNTESTED PORTION
                 event.preventDefault()
@@ -204,11 +276,31 @@ const Canvas = ({ children }) => {
                 const y = canvas.clientHeight / 2 - translateY
                 zoomAtXY(newScale, x, y)
             }
-        }
+        },
+        [
+            isPanning,
+            setTranslateX,
+            setTranslateY,
+            startX,
+            startY,
+            translateX,
+            translateY,
+            scale,
+            getDistance,
+            initialDistance,
+            zoomAtXY,
+            applyTransform,
+        ]
+    )
 
-        const handleTouchEnd = () => {
-            setIsPanning(false)
-        }
+    const handleTouchEnd = useCallback(() => {
+        setIsPanning(false)
+    }, [setIsPanning])
+
+    useEffect(() => {
+        const canvas = canvasRef.current
+        const parent = parentRef.current
+        parent.style.transformOrigin = '0 0' // Set the transform origin to the top left corner so the maths work out
 
         canvas.addEventListener('mousedown', handleMouseDown)
         canvas.addEventListener('mouseup', handleMouseUp)
@@ -220,11 +312,6 @@ const Canvas = ({ children }) => {
         canvas.addEventListener('touchstart', handleTouchStart)
         canvas.addEventListener('touchmove', handleTouchMove)
         canvas.addEventListener('touchend', handleTouchEnd)
-        canvas.addEventListener('contextmenu', (event) => {
-            if (event.button === 1) {
-                event.preventDefault()
-            }
-        })
 
         return () => {
             canvas.removeEventListener('mousedown', handleMouseDown)
@@ -239,13 +326,16 @@ const Canvas = ({ children }) => {
             canvas.removeEventListener('touchend', handleTouchEnd)
         }
     }, [
-        isPanning,
-        startX,
-        startY,
-        translateX,
-        translateY,
-        scale,
-        initialDistance,
+        handleMouseDown,
+        handleMouseUp,
+        handleMouseMove,
+        handleWheel,
+        handleMouseLeave,
+        handleGestureStart,
+        handleGestureChange,
+        handleTouchStart,
+        handleTouchMove,
+        handleTouchEnd,
     ])
 
     return (
