@@ -1,5 +1,4 @@
-function logError(msg, error) {
-    console.error('ChatGPT TreeView Error: ', msg, error)
+export function generateUserMessageUUID() {
+    const uuid = crypto.randomUUID()
+    return "aaa" + uuid.slice(3)
 }
-
-export { logError }

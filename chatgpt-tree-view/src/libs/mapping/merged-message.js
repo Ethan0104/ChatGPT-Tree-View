@@ -7,14 +7,14 @@ import {
     AssistantReply,
 } from './util-models'
 import { MergedMessageBlock } from '../elements/message-block'
-import { logError } from '../utils'
+import { logError } from '../logger'
 import { MODEL_TYPES } from '../../constants/modelTypes'
 
 class MergedMessage {
     // the class that represents a supernode in the tree:
     // it is a collection of 1 user message and (potentially) multiple multipart assistant messages
     constructor(rawUserMessage, parent) {
-        this.id = rawUserMessage.id
+        this.id = rawUserMessage.id  // TODO: this id is the first user message's id if there are more user msgs
         this.parent = parent
 
         // load the user message first, the user message is like the root within the tree in this supernode
@@ -242,7 +242,7 @@ class MergedMessage {
     // --- UI STUFF ---
 
     initElement() {
-        this.element = <MergedMessageBlock message={this} />
+        this.element = <MergedMessageBlock message={this} key={this.id} />
     }
 
     renderElementRecurse() {

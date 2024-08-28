@@ -1,4 +1,4 @@
-import { logError } from '../utils'
+import { logError } from '../logger'
 import { MergedMessage } from './merged-message'
 import { RawMessage } from './raw-message'
 

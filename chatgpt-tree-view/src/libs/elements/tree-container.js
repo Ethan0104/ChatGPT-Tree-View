@@ -52,8 +52,8 @@ const TreeContainer = ({ convoTree }) => {
     return (
         <>
             {blocks}
-            {arrowParams.map((arrowParam) => {
-                return <Arrow {...arrowParam} />
+            {arrowParams.map((arrowParam, index) => {
+                return <Arrow key={index} {...arrowParam} />
             })}
         </>
     )

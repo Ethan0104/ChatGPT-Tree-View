@@ -5,15 +5,15 @@ import {
     CHATGPT_OLD_DOMAIN,
     CONVERSATION_ENDPOINT,
     BEARER_TOKEN_COOKIE_NAME,
-} from './constants/network.js'
+} from './constants/network'
 import {
     checkDomain,
     maybeAddToConversationsCache,
     retrieveTreeResponse,
     captureRequestParams,
     extractConvoIdFromUrl,
-} from './libs/network-utils.js'
-import { logError } from './libs/utils.js'
+} from './libs/network-utils'
+import { logError } from './libs/logger'
 
 // --- Caches ---
 let headersCache = new Map([

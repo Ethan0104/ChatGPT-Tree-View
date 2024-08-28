@@ -7,8 +7,8 @@ import {
     AUTHORIZATION_HEADER_NAME,
     OAI_DEVICE_ID_HEADER_NAME,
     OAI_LANGUAGE_HEADER_NAME,
-} from '../constants/network.js'
-import { logError } from './utils.js'
+} from '../constants/network'
+import { logError } from './logger'
 
 function checkDomain(url) {
     return url.startsWith(CHATGPT_DOMAIN) || url.startsWith(CHATGPT_OLD_DOMAIN)

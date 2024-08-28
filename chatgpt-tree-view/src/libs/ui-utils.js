@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 
 import { App } from './elements/app'
-import { ConvoTree } from './mapping/convo-tree.js'
+import { ConvoTree } from './mapping/convo-tree'
 import { Canvas } from './elements/canvas'
 
 function initializeTreeSpace(mapping, currentNodeId) {
