@@ -13,8 +13,6 @@ const TreeProvider = ({ children, convoTree }) => {
     useEffect(() => {
         if (Object.keys(dimensions).length === blocks.length) {
             const newPositions = reingoldTilford(convoTree.roots, dimensions)
-            console.log('ROOT', convoTree.roots[0])
-            console.log('newPositions', newPositions)
             setPositions(newPositions)
         }
     }, [dimensions])

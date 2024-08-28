@@ -1,12 +1,14 @@
 function getTopRight2ButtonsFlexboxDiv() {
-    // XYZ - prone to change
-    const largeViewDiv = document.querySelector(
-        '#__next > div.relative.z-0.flex.h-full.w-full.overflow-hidden > div.relative.flex.h-full.max-w-full.flex-1.flex-col.overflow-hidden > main > div.flex.h-full.flex-col.focus-visible\\:outline-0 > div.flex-1.overflow-hidden > div > div > div > div > div.sticky.top-0.p-3.mb-1\\.5.flex.items-center.justify-between.z-10.h-14.font-semibold.bg-token-main-surface-primary > div.flex.gap-2.pr-1'
-    )
-    const smallViewDiv = document.querySelector(
-        '#__next > div.relative.z-0.flex.h-full.w-full.overflow-hidden > div > div.sticky.top-0.z-10.flex.min-h-\\[40px\\].items-center.justify-center.border-b.border-token-border-medium.bg-token-main-surface-primary.pl-1.juice\\:min-h-\\[60px\\].juice\\:border-transparent.juice\\:pl-0.md\\:hidden > div.absolute.bottom-0.right-0.top-0.inline-flex.items-center.juice\\:justify-center'
-    )
-    return largeViewDiv || smallViewDiv
+    try {
+        // XYZ - prone to change
+        const largeViewDiv = document.querySelector('[data-testid="profile-button"]').parentNode
+        const smallViewDiv = document.querySelector(
+            '#__next > div.relative.z-0.flex.h-full.w-full.overflow-hidden > div > div.sticky.top-0.z-10.flex.min-h-\\[40px\\].items-center.justify-center.border-b.border-token-border-medium.bg-token-main-surface-primary.pl-1.juice\\:min-h-\\[60px\\].juice\\:border-transparent.juice\\:pl-0.md\\:hidden > div.absolute.bottom-0.right-0.top-0.inline-flex.items-center.juice\\:justify-center'
+        ) // not working
+        return largeViewDiv || smallViewDiv
+    } catch (e) {
+        return null
+    }
 }
 
 function createTreeButton() {

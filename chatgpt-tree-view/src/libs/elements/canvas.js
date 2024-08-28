@@ -18,13 +18,12 @@ const Canvas = ({ children }) => {
     const [scale, setScale] = useState(1)
     const [initialDistance, setInitialDistance] = useState(null)
 
-    
     useEffect(() => {
         const canvas = canvasRef.current
         const parent = parentRef.current
         parent.style.transformOrigin = '0 0' // Set the transform origin to the top left corner so the maths work out
-        
-        let wheelEventEndTimeout = null // for detecting end of wheel event
+
+        let wheelEndTimeout = null
 
         const getMousePosition = (event) => {
             const parentRect = canvasRef.current.getBoundingClientRect()
@@ -32,6 +31,12 @@ const Canvas = ({ children }) => {
                 mouseX: event.clientX - parentRect.left,
                 mouseY: event.clientY - parentRect.top,
             }
+        }
+
+        const getDistance = (touch1, touch2) => {
+            const dx = touch2.clientX - touch1.clientX
+            const dy = touch2.clientY - touch1.clientY
+            return Math.sqrt(dx * dx + dy * dy)
         }
 
         const zoomAtXY = (newScale, centerX, centerY) => {
@@ -46,6 +51,7 @@ const Canvas = ({ children }) => {
             const newTranslateX = translateX + (1 - s / scale) * x
             const newTranslateY = translateY + (1 - s / scale) * y
 
+            console.log("zoomAtXY", newTranslateX, newTranslateY)
             setTranslateX(newTranslateX)
             setTranslateY(newTranslateY)
             setScale(s)
@@ -63,23 +69,29 @@ const Canvas = ({ children }) => {
         }
 
         const handleMouseUp = () => {
+            // for mouse users
             setIsPanning(false)
         }
 
         const handleMouseMove = (event) => {
+            // for mouse users
             if (!isPanning) return
+            if (event.button !== 1) return
+
             setTranslateX(event.clientX - startX)
             setTranslateY(event.clientY - startY)
             parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`
         }
 
-
         const handleWheel = (event) => {
-            if (!canvas.contains(event.target)) return
-            event.preventDefault()
+            // console.log(event)
+            if (!canvas.contains(event.target)) {
+                return
+            }
 
             if (event.ctrlKey || event.metaKey) {
                 // Zooming
+                event.preventDefault()
                 const scrollDirection = event.deltaY > 0 ? -1 : 1
 
                 // Calculate the new scale
@@ -90,6 +102,48 @@ const Canvas = ({ children }) => {
                 zoomAtXY(newScale, mouseX, mouseY)
             } else {
                 // Panning
+
+                // Determine what the user is scrolling over
+                const findScrollableParent = (element) => {
+                    let parent = element
+                    while (parent && parent !== document.body) {
+                        const overflowY = window.getComputedStyle(parent).overflowY
+                        const isScrollable =
+                            (overflowY === 'auto' || overflowY === 'scroll') &&
+                            parent.scrollHeight > parent.clientHeight
+    
+                        if (isScrollable) {
+                            return parent
+                        }
+                        parent = parent.parentElement
+                    }
+                    return null
+                }
+
+                // Find the nearest scrollable ancestor
+                const scrollableParent = findScrollableParent(event.target)
+                // console.log(scrollableParent)
+
+                // Prevent default behavior only if no scrollable parent is found
+                if (
+                    scrollableParent &&
+                    scrollableParent.getAttribute('name') ==
+                        'singular-message-display' &&
+                    event.wheelDeltaY !== 0 &&
+                    isPanning === false
+                ) {
+                    setIsPanning(false)
+                    return
+                } else {
+                    event.preventDefault()
+                }
+
+                setIsPanning(true)
+                clearInterval(wheelEndTimeout)
+                wheelEndTimeout = setTimeout(() => {
+                    setIsPanning(false)
+                }, 500)
+
                 setTranslateX(translateX - event.deltaX * PAN_INTENSITY)
                 setTranslateY(translateY - event.deltaY * PAN_INTENSITY)
                 parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`
@@ -154,13 +208,6 @@ const Canvas = ({ children }) => {
 
         const handleTouchEnd = () => {
             setIsPanning(false)
-            canvas.style.cursor = 'default'
-        }
-
-        const getDistance = (touch1, touch2) => {
-            const dx = touch2.clientX - touch1.clientX
-            const dy = touch2.clientY - touch1.clientY
-            return Math.sqrt(dx * dx + dy * dy)
         }
 
         canvas.addEventListener('mousedown', handleMouseDown)

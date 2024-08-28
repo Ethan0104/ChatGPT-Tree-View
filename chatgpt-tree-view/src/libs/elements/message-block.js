@@ -26,8 +26,16 @@ const SingularMessageDisplay = ({ message, isUser }) => {
     })
 
     return (
-        <div className="w-full mx-auto flex flex-1 gap-4 text-base bg-dark-textChunkBackground p-4 md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] rounded-md">
-            <div className="w-full group/conversation-turn relative flex min-w-0 flex-col gap-1 md:gap-3" ref={ref} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <div
+            className="w-full mx-auto flex flex-1 gap-4 text-base bg-dark-textChunkBackground p-4 md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] max-h-[50rem] overflow-auto rounded-md overscroll-contain"
+            name="singular-message-display"  // for canvas to find this
+        >
+            <div
+                className="w-full group/conversation-turn relative flex min-w-0 flex-col gap-1 md:gap-3 overscroll-contain"
+                ref={ref}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+            >
                 {textChunks.map((textChunk, index) => {
                     return (
                         <MilkdownProvider>
@@ -118,7 +126,7 @@ const MergedMessageBlock = ({ message }) => {
 
     const { positions, setPositions, dimensions, setDimensions } =
         useTreeContext()
-    
+
     const [hovered, setHovered] = useState(false)
 
     const handleMouseEnter = () => {
@@ -169,7 +177,7 @@ const MergedMessageBlock = ({ message }) => {
 
     return (
         <div
-            className="flex flex-col gap-3 text-base py-[18px] px-3 md:px-4 lg:px-1 xl:px-5 border-2 bg-dark-blockBackground rounded-[36px] border-gray-200 absolute shadow-xl shadow-dark-shadow"
+            className="flex flex-col gap-3 text-base py-[18px] px-4 border-2 bg-dark-blockBackground rounded-[36px] border-gray-200 absolute shadow-xl shadow-dark-shadow"
             style={{
                 width: '40rem',
             }}

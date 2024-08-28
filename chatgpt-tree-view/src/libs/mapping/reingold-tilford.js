@@ -5,8 +5,8 @@ import {
 } from '../../constants/treeLayout'
 
 function reingoldTilford(roots, dimensions) {
-    const xOffset = 0
-    const yOffset = 0
+    const xOffset = -1800
+    const yOffset = 200
 
     const positions = {}
     const globalWidth = dimensions[roots[0].id].width
