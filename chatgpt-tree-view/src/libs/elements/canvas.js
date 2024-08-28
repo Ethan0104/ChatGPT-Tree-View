@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react'
+import React, { useRef, useEffect, useCallback } from 'react'
 
 import { useCanvasContext } from './canvas-provider'
 
@@ -31,7 +31,22 @@ const Canvas = ({ children }) => {
 
     let wheelEndTimeout = null
 
-    // Memoized functions
+    // Constant Helper Functions
+    const getMousePosition = (event) => {
+        const parentRect = canvasRef.current.getBoundingClientRect()
+        return {
+            mouseX: event.clientX - parentRect.left,
+            mouseY: event.clientY - parentRect.top,
+        }
+    }
+
+    const getDistance = (touch1, touch2) => {
+        const dx = touch2.clientX - touch1.clientX
+        const dy = touch2.clientY - touch1.clientY
+        return Math.sqrt(dx * dx + dy * dy)
+    }
+
+    // Memoized functions using useCallback
     const applyTransform = useCallback(() => {
         const parent = parentRef.current
         parent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`
@@ -63,23 +78,6 @@ const Canvas = ({ children }) => {
             applyTransform,
         ]
     )
-
-    const getMousePosition = useCallback(
-        (event) => {
-            const parentRect = canvasRef.current.getBoundingClientRect()
-            return {
-                mouseX: event.clientX - parentRect.left,
-                mouseY: event.clientY - parentRect.top,
-            }
-        },
-        []
-    )
-
-    const getDistance = useCallback((touch1, touch2) => {
-        const dx = touch2.clientX - touch1.clientX
-        const dy = touch2.clientY - touch1.clientY
-        return Math.sqrt(dx * dx + dy * dy)
-    }, [])
 
     const handleMouseDown = useCallback(
         (event) => {
@@ -188,7 +186,6 @@ const Canvas = ({ children }) => {
         },
         [
             scale,
-            getMousePosition,
             zoomAtXY,
             isPanning,
             setIsPanning,
@@ -251,7 +248,6 @@ const Canvas = ({ children }) => {
             translateX,
             translateY,
             setInitialDistance,
-            getDistance,
         ]
     )
 
@@ -286,7 +282,6 @@ const Canvas = ({ children }) => {
             translateX,
             translateY,
             scale,
-            getDistance,
             initialDistance,
             zoomAtXY,
             applyTransform,
