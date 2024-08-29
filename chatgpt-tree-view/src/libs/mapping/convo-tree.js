@@ -110,6 +110,30 @@ export class ConvoTree {
         return result
     }
 
+    addUserMessage(parentMergedMessageId) {
+        // find the parent
+        let parent = null
+        const traverse = (merged) => {
+            if (merged.id === parentMergedMessageId) {
+                parent = merged
+                return
+            }
+            merged.children.forEach((child) => traverse(child))
+        }
+        this.roots.forEach((root) => traverse(root))
+
+        if (parent === null) {
+            throw new Error('Parent not found')
+        }
+
+        // create the new user message
+        const newMergedMessage = new MergedMessage(null, parent)
+        newMergedMessage.initElement()
+        parent.children.push(newMergedMessage)
+        const id = newMergedMessage.id
+        return id
+    }
+
     // --- DEBUGGING ---
 
     printRawTreePreOrder() {

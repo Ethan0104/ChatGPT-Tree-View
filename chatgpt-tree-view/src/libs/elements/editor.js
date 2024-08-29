@@ -25,15 +25,6 @@ const MilkdownEditor = ({ defaultValue }) => {
             .use(commonmark)
     )
 
-    // useEffect(() => {
-    //   const instance = useInstance(get)
-    //   console.log(instance)
-    // }, [])
-
-    // const [what, f] = useInstance(get)
-    // const res = f()
-    // console.log(res)
-
     return <Milkdown />
 }
 

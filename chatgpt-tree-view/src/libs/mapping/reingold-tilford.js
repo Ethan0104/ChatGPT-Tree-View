@@ -52,10 +52,8 @@ function reingoldTilford(roots, dimensions) {
     )
     thirdPass(positions, root, xAdjustment)
     swapXYForAll(positions)
-    // centerCorrection(positions, dimensions)
 
     delete positions.root
-
     return positions
 }
 

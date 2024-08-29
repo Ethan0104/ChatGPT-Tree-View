@@ -3,6 +3,7 @@ import { MilkdownProvider } from '@milkdown/react'
 
 import { MilkdownEditor } from './editor'
 import { useTreeContext } from './tree-provider'
+import { useLayoutContext } from './layout-provider'
 import { useCanvasContext } from './canvas-provider'
 import {
     UserLogo,
@@ -14,24 +15,25 @@ import {
 } from './svgs'
 
 const SingularMessageDisplay = ({ message, isUser }) => {
-    const chunks = message.chunks
-
-    const textChunks = chunks.filter((chunk) => chunk.type === 'text')
+    let content = null
+    if (message) {
+        const chunks = message.chunks
+        const textChunks = chunks.filter((chunk) => chunk.type === 'text')
+        content = textChunks[0].value
+    } else {
+        content = ""
+    }
 
     return (
         <div
             className="w-full mx-auto flex flex-1 gap-4 text-base bg-dark-textChunkBackground p-4 md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] max-h-[50rem] overflow-auto hover:overflow-y-scroll rounded-md overscroll-contain"
             name="singular-message-display" // for canvas to find this
-            onMouseDown={(e) => {e.stopPropagation()}}
+            onMouseDown={(e) => {e.stopPropagation()}}  // separate text select and dragging
         >
             <div className="w-full group/conversation-turn relative flex min-w-0 flex-col gap-1 md:gap-3 overscroll-contain cursor-text">
-                {textChunks.map((textChunk, index) => {
-                    return (
-                        <MilkdownProvider key={index}>
-                            <MilkdownEditor defaultValue={textChunk.value} />
-                        </MilkdownProvider>
-                    )
-                })}
+                <MilkdownProvider>
+                    <MilkdownEditor defaultValue={content} />
+                </MilkdownProvider>
             </div>
         </div>
     )
@@ -108,6 +110,7 @@ const MergedMessageBlock = ({ message }) => {
     const id = message.id
     const userMessage = message.userMessage
     const assistantBranches = message.assistantBranches
+    const activeAssistantBranch = assistantBranches ? assistantBranches[assistantBranches.length - 1] : null
 
     const containerRef = useRef(null)
     const blockRef = useRef(null)
@@ -123,7 +126,9 @@ const MergedMessageBlock = ({ message }) => {
         setHighestZIndex,
         zIndices,
         setZIndices,
-    } = useTreeContext()
+        addNewBlock,
+    } = useLayoutContext()
+    const { convoTree } = useTreeContext()
 
     const { scale } = useCanvasContext()
 
@@ -157,19 +162,20 @@ const MergedMessageBlock = ({ message }) => {
                 resizeObserver.unobserve(block)
             }
         }
-    }, [message, id, blockRef, setDimensions])
+    }, [message, id, setDimensions])
 
     useEffect(() => {
         setPosition(positions[id] || { x: 0, y: 0 })
     }, [positions, id])
 
     useEffect(() => {
-        const offsetPos = {
-            x: position.x,
+        // the block's transform origin is 0 0 but our positions refer to the center
+        const topLeftPos = {
+            x: position.x - dimension.width / 2,
             y: position.y - dimension.height / 2,
         }
-        containerRef.current.style.transform = `translate(${offsetPos.x}px, ${offsetPos.y}px)`
-    }, [position])
+        containerRef.current.style.transform = `translate(${topLeftPos.x}px, ${topLeftPos.y}px)`
+    }, [position, dimension])
 
     const handleDragMove = useCallback(
         (event) => {
@@ -216,6 +222,11 @@ const MergedMessageBlock = ({ message }) => {
         [setZIndices, zIndices, setHighestZIndex, handleDragMove, handleDragEnd]
     )
 
+    const handleAddChild = () => {
+        const childId = convoTree.addUserMessage(id)
+        addNewBlock(id, childId)
+    }
+
     return (
         <div
             className="absolute"
@@ -239,10 +250,11 @@ const MergedMessageBlock = ({ message }) => {
                 <SingularMessageDisplay message={userMessage} isUser />
 
                 <AssistantMessageMenu />
-                <SingularMessageDisplay message={assistantBranches[0]} />
+                <SingularMessageDisplay message={activeAssistantBranch} />
             </div>
             <div
                 className="w-12 absolute rounded-lg transition-all hover:bg-neutral-800 hover:opacity-80 p-1"
+                onClick={handleAddChild}
                 style={{
                     transform: `translate(${dimension.width}px, -${dimension.height}px)`,
                     height: `${dimension.height}px`,

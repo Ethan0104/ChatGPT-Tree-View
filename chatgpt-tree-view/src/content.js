@@ -2,15 +2,8 @@
 
 import './content.css'
 
-import { getConversationHistoryRequests } from './libs/network-utils'
 import { addTreeButton } from './libs/elements/tree-button'
 import { initializeTreeSpace } from './libs/ui-utils'
-
-// // call the function whenever the user double clicks anywhere
-// document.addEventListener('dblclick', () => {
-//     const requests = getConversationHistoryRequests()
-//     console.log(requests)
-// })
 
 // handle the "enter tree view" button
 addTreeButton()
@@ -35,8 +28,6 @@ setTimeout(() => {
 // --- Event Listeners (from Background Script) ---
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'render-tree') {
-        console.log('rendering tree')
-
         const treeResponse = request.treeResponse
         const mapping = treeResponse.mapping
         const currentNodeId = treeResponse.current_node

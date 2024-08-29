@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client'
 
 import { App } from './elements/app'
 import { ConvoTree } from './mapping/convo-tree'
-import { Canvas } from './elements/canvas'
 
 function initializeTreeSpace(mapping, currentNodeId) {
     // get the root div that's obtained by priming the existing ChatGPT UI

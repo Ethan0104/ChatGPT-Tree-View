@@ -36,13 +36,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 const conversationId = extractConvoIdFromUrl(url)
                 retrieveTreeResponse(conversationId, headersCache)
                     .then((treeResponse) => {
-                        // Logging
-                        // console.log("raw tree")
-                        // tree.printTreePreOrder()
-                        // tree.sanitize()
-                        // console.log("sanitized tree")
-                        // tree.printTreePreOrder()
-
                         // send message to content script to open the tree view
                         console.log('sending message to content script')
                         chrome.tabs.sendMessage(activeTab.id, {
