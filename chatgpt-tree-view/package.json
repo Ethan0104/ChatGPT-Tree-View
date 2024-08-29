@@ -32,13 +32,9 @@
     "webpack-merge": "^5.10.0"
   },
   "dependencies": {
-    "@milkdown/core": "^7.5.0",
-    "@milkdown/ctx": "^7.5.0",
-    "@milkdown/preset-commonmark": "^7.5.0",
-    "@milkdown/prose": "^7.5.0",
+    "@milkdown/kit": "^7.5.5",
     "@milkdown/react": "^7.5.0",
     "@milkdown/theme-nord": "^7.5.0",
-    "@milkdown/transformer": "^7.5.0",
     "curved-arrows": "^0.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

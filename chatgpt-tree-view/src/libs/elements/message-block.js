@@ -13,8 +13,11 @@ import {
     TrashIcon,
     PlusIcon,
 } from './svgs'
+import { PrimaryButton } from './buttons'
 
-const SingularMessageDisplay = ({ message, isUser }) => {
+const SingularMessageDisplay = ({ message, isUser, editing }) => {
+    const editorRef = useRef(null)
+
     let content = null
     if (message) {
         const chunks = message.chunks
@@ -24,15 +27,25 @@ const SingularMessageDisplay = ({ message, isUser }) => {
         content = ""
     }
 
+    // make the cursor focused on the user message display when editing is true
+    // useEffect(() => {
+    //     console.log("???", editorRef)
+    //     if (editing) {
+    //         // focus on the editor
+    //         // editorRef.current.focus()
+    //         editorRef.current.click()
+    //     }
+    // }, [editing])
+
     return (
         <div
             className="w-full mx-auto flex flex-1 gap-4 text-base bg-dark-textChunkBackground p-4 md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] max-h-[50rem] overflow-auto hover:overflow-y-scroll rounded-md overscroll-contain"
             name="singular-message-display" // for canvas to find this
             onMouseDown={(e) => {e.stopPropagation()}}  // separate text select and dragging
         >
-            <div className="w-full group/conversation-turn relative flex min-w-0 flex-col gap-1 md:gap-3 overscroll-contain cursor-text">
+            <div className="w-full group/conversation-turn relative flex min-w-0 flex-col gap-1 md:gap-3 overscroll-contain cursor-text" ref={editorRef}>
                 <MilkdownProvider>
-                    <MilkdownEditor defaultValue={content} />
+                    <MilkdownEditor defaultValue={content} editing={editing} />
                 </MilkdownProvider>
             </div>
         </div>
@@ -117,6 +130,7 @@ const MergedMessageBlock = ({ message }) => {
     const [position, setPosition] = useState({ x: 0, y: 0 })
     const [dimension, setDimension] = useState({ width: 0, height: 0 })
     const dragStartPosRef = useRef(null)
+    const [editing, setEditing] = useState(userMessage ? false : true)
 
     const {
         positions,
@@ -129,7 +143,6 @@ const MergedMessageBlock = ({ message }) => {
         addNewBlock,
     } = useLayoutContext()
     const { convoTree } = useTreeContext()
-
     const { scale } = useCanvasContext()
 
     const [hovered, setHovered] = useState(false)
@@ -142,6 +155,7 @@ const MergedMessageBlock = ({ message }) => {
         setHovered(false)
     }
 
+    // update the dimension of the block when the content changes
     useEffect(() => {
         const block = blockRef.current
         if (block) {
@@ -164,10 +178,12 @@ const MergedMessageBlock = ({ message }) => {
         }
     }, [message, id, setDimensions])
 
+    // update the position when the positions change
     useEffect(() => {
         setPosition(positions[id] || { x: 0, y: 0 })
     }, [positions, id])
 
+    // move the block when the position changes
     useEffect(() => {
         // the block's transform origin is 0 0 but our positions refer to the center
         const topLeftPos = {
@@ -247,7 +263,13 @@ const MergedMessageBlock = ({ message }) => {
                 ref={blockRef}
             >
                 <UserMessageMenu />
-                <SingularMessageDisplay message={userMessage} isUser />
+                <SingularMessageDisplay message={userMessage} isUser editing={editing} />
+
+                {
+                    editing && <div className='flex justify-end'>
+                        <PrimaryButton text={"Send"} />
+                    </div>
+                }
 
                 <AssistantMessageMenu />
                 <SingularMessageDisplay message={activeAssistantBranch} />

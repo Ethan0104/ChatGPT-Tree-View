@@ -3,18 +3,16 @@ import {
     Editor,
     rootCtx,
     defaultValueCtx,
-    editorViewOptionsCtx,
-} from '@milkdown/core'
+    editorViewCtx,
+} from '@milkdown/kit/core'
+import { commonmark } from '@milkdown/kit/preset/commonmark'
 import { nord } from '@milkdown/theme-nord'
 import {
     Milkdown,
-    MilkdownProvider,
     useEditor,
-    useInstance,
 } from '@milkdown/react'
-import { commonmark } from '@milkdown/preset-commonmark'
 
-const MilkdownEditor = ({ defaultValue }) => {
+const MilkdownEditor = ({ defaultValue, editing }) => {
     const { get } = useEditor((root) =>
         Editor.make()
             .config(nord)
@@ -25,7 +23,16 @@ const MilkdownEditor = ({ defaultValue }) => {
             .use(commonmark)
     )
 
-    return <Milkdown />
+    const editor = get()
+    useEffect(() => {
+        if (editing && editor) {
+            editor.action((ctx) => {
+                ctx.get(editorViewCtx).focus()
+            })
+        }
+    }, [editor, editing])
+
+    return <Milkdown/>
 }
 
 export { MilkdownEditor }
