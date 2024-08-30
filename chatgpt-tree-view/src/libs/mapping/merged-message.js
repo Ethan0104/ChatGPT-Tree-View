@@ -7,7 +7,7 @@ import {
     AssistantReply,
 } from './util-models'
 import { MergedMessageBlock } from '../elements/message-block'
-import { logError } from '../logger'
+import logger from '../logger'
 import { generateUserMessageUUID } from '../utils'
 import { MODEL_TYPES } from '../../constants/modelTypes'
 
@@ -15,7 +15,7 @@ class MergedMessage {
     // the class that represents a supernode in the tree
     // it is a collection of 1 user message and (potentially) multiple multipart assistant messages
 
-    // For the constructor, either pass in the actual raw user message object (when parsing the received convo history), 
+    // For the constructor, either pass in the actual raw user message object (when parsing the received convo history),
     // or pass in null (when creating a new user message from scratch)
     constructor(rawUserMessage, parent) {
         // fields to set:
@@ -30,13 +30,13 @@ class MergedMessage {
             this.id = generateUserMessageUUID()
             return
         }
-        this.id = rawUserMessage.id  // TODO: this id is the first user message's id if there are more user msgs
+        this.id = rawUserMessage.id // TODO: this id is the first user message's id if there are more user msgs
 
         // load the user message first, the user message is like the root within the tree in this supernode
         try {
             this.userMessage = this.loadUserMessageFromRaw(rawUserMessage)
         } catch (error) {
-            logError('Failed to load User Message: ', error)
+            logger.error('Failed to load User Message: ', error)
         }
 
         // explore the paths that stem from the user message (this will have more than one path iff "regenerate" is used)
@@ -76,7 +76,7 @@ class MergedMessage {
                 })
             })
         } catch (error) {
-            logError(
+            logger.error(
                 'Failed to load (potentially) multiple multipart Assistant Messages: ',
                 error
             )

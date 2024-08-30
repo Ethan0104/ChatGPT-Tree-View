@@ -136,12 +136,7 @@ const TrashIcon = () => (
 )
 
 const PlusIcon = () => (
-    <svg
-        fill="currentColor"
-        width="24"
-        height="24"
-        viewBox="0 0 45.402 45.402"
-    >
+    <svg fill="currentColor" width="24" height="24" viewBox="0 0 45.402 45.402">
         <g>
             <path
                 d="M41.267,18.557H26.832V4.134C26.832,1.851,24.99,0,22.707,0c-2.283,0-4.124,1.851-4.124,4.135v14.432H4.141

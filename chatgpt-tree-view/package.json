@@ -35,6 +35,7 @@
     "@milkdown/kit": "^7.5.5",
     "@milkdown/react": "^7.5.0",
     "@milkdown/theme-nord": "^7.5.0",
+    "axios": "^1.7.5",
     "curved-arrows": "^0.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

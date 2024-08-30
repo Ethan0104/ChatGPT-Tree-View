@@ -1,4 +1,4 @@
-import { logError } from '../logger'
+import logger from '../logger'
 import { MergedMessage } from './merged-message'
 import { RawMessage } from './raw-message'
 
@@ -34,7 +34,7 @@ export class ConvoTree {
             // step 5: render the elements for all the supernodes
             this.renderElementsForAll()
         } catch (error) {
-            logError('Failed to initialize ConvoTree: ', error)
+            logger.error('Failed to initialize ConvoTree: ', error)
         }
     }
 

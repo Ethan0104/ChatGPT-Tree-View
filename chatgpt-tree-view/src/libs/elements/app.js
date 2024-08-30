@@ -7,7 +7,7 @@ import { LayoutProvider } from './layout-provider'
 import { TreeContainer } from './tree-container'
 
 const App = ({ convoTree }) => {
-    console.log("app is re-rendering")
+    console.log('app is re-rendering')
     return (
         <TreeProvider convoTree={convoTree}>
             <LayoutProvider>

@@ -4,6 +4,7 @@ import './content.css'
 
 import { addTreeButton } from './libs/elements/tree-button'
 import { initializeTreeSpace } from './libs/ui-utils'
+import logger from './libs/logger'
 
 // handle the "enter tree view" button
 addTreeButton()
@@ -33,5 +34,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const currentNodeId = treeResponse.current_node
 
         initializeTreeSpace(mapping, currentNodeId)
+    } else if (request.action === 'tree-fetch-failed') {
+        logger.error('Failed to fetch tree', request.error)
     }
 })

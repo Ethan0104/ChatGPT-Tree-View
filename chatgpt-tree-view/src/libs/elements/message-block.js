@@ -13,7 +13,8 @@ import {
     TrashIcon,
     PlusIcon,
 } from './svgs'
-import { PrimaryButton } from './buttons'
+import { PillButton } from './buttons'
+import { act } from 'react'
 
 const SingularMessageDisplay = ({ message, isUser, editing }) => {
     const editorRef = useRef(null)
@@ -24,7 +25,7 @@ const SingularMessageDisplay = ({ message, isUser, editing }) => {
         const textChunks = chunks.filter((chunk) => chunk.type === 'text')
         content = textChunks[0].value
     } else {
-        content = ""
+        content = ''
     }
 
     // make the cursor focused on the user message display when editing is true
@@ -41,9 +42,14 @@ const SingularMessageDisplay = ({ message, isUser, editing }) => {
         <div
             className="w-full mx-auto flex flex-1 gap-4 text-base bg-dark-textChunkBackground p-4 md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] max-h-[50rem] overflow-auto hover:overflow-y-scroll rounded-md overscroll-contain"
             name="singular-message-display" // for canvas to find this
-            onMouseDown={(e) => {e.stopPropagation()}}  // separate text select and dragging
+            onMouseDown={(e) => {
+                e.stopPropagation()
+            }} // separate text select and dragging
         >
-            <div className="w-full group/conversation-turn relative flex min-w-0 flex-col gap-1 md:gap-3 overscroll-contain cursor-text" ref={editorRef}>
+            <div
+                className="w-full group/conversation-turn relative flex min-w-0 flex-col gap-1 md:gap-3 overscroll-contain cursor-text"
+                ref={editorRef}
+            >
                 <MilkdownProvider>
                     <MilkdownEditor defaultValue={content} editing={editing} />
                 </MilkdownProvider>
@@ -123,7 +129,9 @@ const MergedMessageBlock = ({ message }) => {
     const id = message.id
     const userMessage = message.userMessage
     const assistantBranches = message.assistantBranches
-    const activeAssistantBranch = assistantBranches ? assistantBranches[assistantBranches.length - 1] : null
+    const activeAssistantBranch = assistantBranches
+        ? assistantBranches[assistantBranches.length - 1]
+        : null
 
     const containerRef = useRef(null)
     const blockRef = useRef(null)
@@ -263,26 +271,37 @@ const MergedMessageBlock = ({ message }) => {
                 ref={blockRef}
             >
                 <UserMessageMenu />
-                <SingularMessageDisplay message={userMessage} isUser editing={editing} />
+                <SingularMessageDisplay
+                    message={userMessage}
+                    isUser
+                    editing={editing}
+                />
 
-                {
-                    editing && <div className='flex justify-end'>
-                        <PrimaryButton text={"Send"} />
+                {editing && (
+                    <div className="flex justify-end gap-2">
+                        <PillButton text="Cancel" />
+                        <PillButton text="Send" isPrimary />
                     </div>
-                }
+                )}
 
-                <AssistantMessageMenu />
-                <SingularMessageDisplay message={activeAssistantBranch} />
+                {activeAssistantBranch && (
+                    <>
+                        <AssistantMessageMenu />
+                        <SingularMessageDisplay
+                            message={activeAssistantBranch}
+                        />
+                    </>
+                )}
             </div>
             <div
-                className="w-12 absolute rounded-lg transition-all hover:bg-neutral-800 hover:opacity-80 p-1"
+                className="w-12 absolute rounded-lg hover:bg-neutral-800 hover:opacity-80 p-1"
                 onClick={handleAddChild}
                 style={{
                     transform: `translate(${dimension.width}px, -${dimension.height}px)`,
                     height: `${dimension.height}px`,
                 }}
             >
-                <div className='mx-auto my-3 flex justify-center items-center'>
+                <div className="mx-auto my-3 flex justify-center items-center">
                     <PlusIcon />
                 </div>
             </div>

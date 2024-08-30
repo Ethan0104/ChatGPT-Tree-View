@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 
-const PrimaryButton = ({ text, onClick }) => {
+const PillButton = ({ onClick, text, isPrimary }) => {
     const [hovered, setHovered] = useState(false)
     const buttonRef = useRef(null)
 
@@ -16,9 +16,11 @@ const PrimaryButton = ({ text, onClick }) => {
         buttonRef.current.style.cursor = hovered ? 'pointer' : 'default'
     }, [hovered])
 
+    const btnClass = isPrimary ? 'btn-primary' : 'btn-secondary'
+
     return (
         <div
-            className="bg-dark-primary rounded-full transition-all hover:opacity-80 p-2 text-xl"
+            className={`btn ${btnClass}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             ref={buttonRef}
@@ -29,4 +31,4 @@ const PrimaryButton = ({ text, onClick }) => {
     )
 }
 
-export { PrimaryButton }
+export { PillButton }

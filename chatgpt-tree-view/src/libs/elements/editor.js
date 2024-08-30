@@ -7,10 +7,7 @@ import {
 } from '@milkdown/kit/core'
 import { commonmark } from '@milkdown/kit/preset/commonmark'
 import { nord } from '@milkdown/theme-nord'
-import {
-    Milkdown,
-    useEditor,
-} from '@milkdown/react'
+import { Milkdown, useEditor } from '@milkdown/react'
 
 const MilkdownEditor = ({ defaultValue, editing }) => {
     const { get } = useEditor((root) =>
@@ -32,7 +29,7 @@ const MilkdownEditor = ({ defaultValue, editing }) => {
         }
     }, [editor, editing])
 
-    return <Milkdown/>
+    return <Milkdown />
 }
 
 export { MilkdownEditor }
