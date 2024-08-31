@@ -1,8 +1,8 @@
 import logger from '../logger'
-import { MergedMessage } from './merged-message'
-import { RawMessage } from './raw-message'
+import MergedMessage from './merged-message'
+import RawMessage from './raw-message'
 
-export class ConvoTree {
+class ConvoTree {
     constructor(rawMapping, currentNodeId) {
         try {
             // here begins the long process of turning the rawMapping into a tree with supernodes.
@@ -146,3 +146,5 @@ export class ConvoTree {
         })
     }
 }
+
+export default ConvoTree

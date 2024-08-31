@@ -6,10 +6,10 @@ import {
     UserMessage,
     AssistantReply,
 } from './util-models'
-import { MergedMessageBlock } from '../elements/message-block'
+import MergedMessageBlock from '../components/message-block'
 import logger from '../logger'
-import { generateUserMessageUUID } from '../utils'
-import { MODEL_TYPES } from '../../constants/modelTypes'
+import { generateUserMessageUUID } from '../utils/uuid'
+import MODEL_TYPES from '../constants/modelTypes'
 
 class MergedMessage {
     // the class that represents a supernode in the tree
@@ -283,4 +283,4 @@ class MergedMessage {
     }
 }
 
-export { MergedMessage }
+export default MergedMessage

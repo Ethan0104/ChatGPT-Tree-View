@@ -62,4 +62,4 @@ const Arrow = ({ x0, y0, w0, h0, x1, y1, w1, h1 }) => {
     )
 }
 
-export { Arrow }
+export default Arrow

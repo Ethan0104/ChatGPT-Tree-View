@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 
-import { useTreeContext } from './tree-provider'
-import { useLayoutContext } from './layout-provider'
-import { Arrow } from './arrow'
+import { useTreeContext } from '../providers/tree-provider'
+import { useLayoutContext } from '../providers/layout-provider'
+import Arrow from './arrow'
 
 const TreeContainer = () => {
     const { convoTree } = useTreeContext()
@@ -64,4 +64,4 @@ const TreeContainer = () => {
     )
 }
 
-export { TreeContainer }
+export default TreeContainer

@@ -2,7 +2,7 @@ import {
     SIBLING_SEPARATION,
     SUBTREE_SEPARATION,
     LEVEL_SEPARATION,
-} from '../../constants/treeLayout'
+} from '../constants/treeLayout'
 
 function reingoldTilford(roots, dimensions) {
     const xOffset = -1800
@@ -316,4 +316,4 @@ function centerCorrection(positions, dimensions) {
     })
 }
 
-export { reingoldTilford }
+export default reingoldTilford

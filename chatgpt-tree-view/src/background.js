@@ -4,9 +4,9 @@ import {
     CHATGPT_DOMAIN,
     CONVERSATION_ENDPOINT,
 } from './constants/network'
-import { captureRequestParams, extractConvoIdFromUrl } from './libs/utils'
-import { fetchConversationHistory } from './libs/api/chatgpt-api'
-import logger from './libs/logger'
+import { captureRequestParams, extractConvoIdFromUrl } from './utils/network'
+import { fetchConversationHistory, requestReplyForUser } from './api/chatgpt-api'
+import logger from './logger'
 
 
 // --- Event Listeners (from Content Script) ---

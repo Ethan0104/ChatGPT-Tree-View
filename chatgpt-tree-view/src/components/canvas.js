@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback } from 'react'
 
-import { useCanvasContext } from './canvas-provider'
+import { useCanvasContext } from '../providers/canvas-provider'
 
 const PAN_INTENSITY = 2
 const ZOOM_INTENSITY = 0.06
@@ -339,4 +339,4 @@ const Canvas = ({ children }) => {
     )
 }
 
-export { Canvas }
+export default Canvas

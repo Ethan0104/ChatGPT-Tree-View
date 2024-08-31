@@ -116,4 +116,4 @@ class RawMessage {
     }
 }
 
-export { RawMessage }
+export default RawMessage

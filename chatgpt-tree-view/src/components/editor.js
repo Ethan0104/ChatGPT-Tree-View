@@ -32,4 +32,4 @@ const MilkdownEditor = ({ defaultValue, editing }) => {
     return <Milkdown />
 }
 
-export { MilkdownEditor }
+export default MilkdownEditor

@@ -1,21 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-import { App } from './elements/app'
-import { ConvoTree } from './mapping/convo-tree'
+import App from '../components/app'
+import ConvoTree from '../mapping/convo-tree'
 
-function initializeTreeSpace(mapping, currentNodeId) {
-    // get the root div that's obtained by priming the existing ChatGPT UI
-    const root = primeExistingUI()
-
-    // initialize the tree
-    const convoTree = new ConvoTree(mapping, currentNodeId)
-
-    const rootDiv = ReactDOM.createRoot(root)
-    rootDiv.render(<App convoTree={convoTree} />)
-}
-
-function primeExistingUI() {
+const primeExistingUI = () => {
     // hide all the conversation turns
     const convoTurns = document.querySelectorAll(
         "[data-testid^='conversation-turn-']"
@@ -37,4 +26,15 @@ function primeExistingUI() {
     return root
 }
 
-export { initializeTreeSpace }
+const initializeTreeSpace = (mapping, currentNodeId) => {
+    // get the root div that's obtained by priming the existing ChatGPT UI
+    const root = primeExistingUI()
+
+    // initialize the tree
+    const convoTree = new ConvoTree(mapping, currentNodeId)
+
+    const rootDiv = ReactDOM.createRoot(root)
+    rootDiv.render(<App convoTree={convoTree} />)
+}
+
+export default initializeTreeSpace

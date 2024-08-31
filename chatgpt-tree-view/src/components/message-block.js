@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react'
 import { MilkdownProvider } from '@milkdown/react'
 
-import { MilkdownEditor } from './editor'
-import { useTreeContext } from './tree-provider'
-import { useLayoutContext } from './layout-provider'
-import { useCanvasContext } from './canvas-provider'
+import MilkdownEditor from './editor'
+import { useTreeContext } from '../providers/tree-provider'
+import { useLayoutContext } from '../providers/layout-provider'
+import { useCanvasContext } from '../providers/canvas-provider'
 import {
     UserLogo,
     AssistantLogo,
@@ -14,7 +14,6 @@ import {
     PlusIcon,
 } from './svgs'
 import { PillButton } from './buttons'
-import { act } from 'react'
 
 const SingularMessageDisplay = ({ message, isUser, editing }) => {
     const editorRef = useRef(null)
@@ -309,4 +308,4 @@ const MergedMessageBlock = ({ message }) => {
     )
 }
 
-export { MergedMessageBlock }
+export default MergedMessageBlock

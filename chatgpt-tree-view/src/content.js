@@ -2,21 +2,18 @@
 
 import './content.css'
 
-import { addTreeButton } from './libs/elements/tree-button'
-import { initializeTreeSpace } from './libs/ui-utils'
-import logger from './libs/logger'
+import injectEntryButton from './injectors/entry-injector'
+import initializeTreeSpace from './injectors/app-injector'
+import logger from './logger'
 
 // handle the "enter tree view" button
-addTreeButton()
 const observer = new MutationObserver((mutationsList, observer) => {
-    for (let mutation of mutationsList) {
-        if (mutation.type === 'childList' || mutation.type === 'subtree') {
-            const buttonAdded = addTreeButton()
-            if (buttonAdded) {
-                break
-            }
-        }
-    }
+    observer.disconnect()
+    injectEntryButton()
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+    })
 })
 
 setTimeout(() => {

@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { CanvasProvider, useCanvasContext } from './canvas-provider'
-import { Canvas } from './canvas'
-import { TreeProvider } from './tree-provider'
-import { LayoutProvider } from './layout-provider'
-import { TreeContainer } from './tree-container'
+import { CanvasProvider, useCanvasContext } from '../providers/canvas-provider'
+import Canvas from './canvas'
+import { TreeProvider } from '../providers/tree-provider'
+import { LayoutProvider } from '../providers/layout-provider'
+import TreeContainer from './tree-container'
 
 const App = ({ convoTree }) => {
     console.log('app is re-rendering')
@@ -24,4 +24,4 @@ const App = ({ convoTree }) => {
     )
 }
 
-export { App }
+export default App

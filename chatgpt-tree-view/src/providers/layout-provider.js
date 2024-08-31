@@ -6,9 +6,9 @@ import React, {
     useCallback,
 } from 'react'
 
-import { LEVEL_SEPARATION } from '../../constants/treeLayout'
+import { LEVEL_SEPARATION } from '../constants/treeLayout'
 import { useTreeContext } from './tree-provider'
-import { reingoldTilford } from '../mapping/reingold-tilford'
+import reingoldTilford from '../mapping/reingold-tilford'
 
 const LayoutContext = createContext()
 

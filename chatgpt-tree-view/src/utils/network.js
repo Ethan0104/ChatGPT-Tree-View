@@ -5,12 +5,7 @@ import {
     OAI_DEVICE_ID_HEADER_NAME,
     OAI_LANGUAGE_HEADER_NAME,
 } from '../constants/network'
-import logger from './logger'
-
-export const generateUserMessageUUID = () => {
-    const uuid = crypto.randomUUID()
-    return 'aaa' + uuid.slice(3)
-}
+import logger from '../logger'
 
 export const extractConvoIdFromUrl = (url) => {
     return url.split('/').pop()
