@@ -1,5 +1,7 @@
 import axios from 'axios'
+
 import logger from '../logger'
+import ConversationResponse from '../models/conversation-response'
 
 const chatgptApi = axios.create({
     baseURL: 'https://chatgpt.com/backend-api',
@@ -10,7 +12,7 @@ const chatgptApi = axios.create({
 })
 
 // get one of the request headers from the local storage, returns null if not found
-const getHeaderFromLocal = async (header) => {
+const getHeaderFromLocal = async (header: string) => {
     return new Promise((resolve, reject) => {
         chrome.storage.local.get([header], (result) => {
             if (chrome.runtime.lastError) {
@@ -25,22 +27,23 @@ const getHeaderFromLocal = async (header) => {
 chatgptApi.interceptors.request.use(
     async (config) => {
         try {
-            const token = await getHeaderFromLocal('jwtToken')
-            const deviceId = await getHeaderFromLocal('deviceId')
-            const language = await getHeaderFromLocal('languageHeader')
+            const token = (await getHeaderFromLocal('jwtToken')) as string
+            const deviceId = (await getHeaderFromLocal('deviceId')) as string
+            const language = (await getHeaderFromLocal(
+                'languageHeader'
+            )) as string
             if (token && deviceId) {
-                config.headers.Authorization = token
+                config.headers['Authorization'] = token
                 config.headers['Oai-device-id'] = deviceId
                 config.headers['Oai-Language'] = language || 'en-US'
                 return config
             } else {
-                throw new Error(`JWT Token or Device Id not found in local storage: ${token}, ${deviceId}`)
+                throw new Error(
+                    `JWT Token or Device Id not found in local storage: ${token}, ${deviceId}`
+                )
             }
         } catch (error) {
-            logger.error(
-                'Error attaching JWT and Device Id to request:',
-                error
-            )
+            logger.error('Error attaching JWT and Device Id to request:', error)
             return Promise.reject(error) // Reject the request if the storage isn't primed
         }
     },
@@ -59,9 +62,11 @@ chatgptApi.interceptors.response.use(
 )
 
 // --- API Request Functions ---
-export const fetchConversationHistory = async (conversationId) => {
+export const fetchConversationHistory = async (
+    conversationId: string
+): Promise<ConversationResponse> => {
     const response = await chatgptApi.get(`/conversation/${conversationId}`)
-    return response.data
+    return response.data as ConversationResponse
 }
 
 export const requestReplyForUser = async () => {
@@ -78,7 +83,7 @@ export const requestReplyForUser = async () => {
         conversation_origin: null,
         force_nulligen: false,
         force_paragen: false,
-        force_paragen_model_slug: "",
+        force_paragen_model_slug: '',
         force_rate_limit: false,
         force_use_sse: true,
         history_and_training_disabled: false,
@@ -93,8 +98,8 @@ export const requestReplyForUser = async () => {
                     parts: ['Hello, how are you doing today?'],
                 },
                 metadata: {},
-                create_time: new Date() / 1000,
-            }
+                create_time: new Date().getTime() / 1000,
+            },
         ],
         model: 'gpt-4o',
         parent_message_id: parentId,
@@ -106,15 +111,16 @@ export const requestReplyForUser = async () => {
     }
     const response = await chatgptApi.post('/conversation', payload, {
         headers: {
-            'Accept': 'text/event-stream',
+            Accept: 'text/event-stream',
             'Accept-Encoding': 'gzip, deflate, br, zstd',
-            'Accept-Language': 'en,de-DE;q=0.9,de;q=0.8,en-US;q=0.7,zh-CN;q=0.6,zh;q=0.5,ja;q=0.4',
+            'Accept-Language':
+                'en,de-DE;q=0.9,de;q=0.8,en-US;q=0.7,zh-CN;q=0.6,zh;q=0.5,ja;q=0.4',
             'Cache-Control': 'no-cache',
             'Content-Type': 'application/json',
-            'Origin': 'https://chatgpt.com',
-            'Pragma': 'no-cache',
-            'Priority': 'u=1, i',
-            'Referer': `https://chatgpt.com/c/${conversationId}`,
+            Origin: 'https://chatgpt.com',
+            Pragma: 'no-cache',
+            Priority: 'u=1, i',
+            Referer: `https://chatgpt.com/c/${conversationId}`,
         },
     })
     logger.info('Reply for user:', response)

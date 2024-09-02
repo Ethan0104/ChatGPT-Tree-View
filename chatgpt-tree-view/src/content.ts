@@ -4,6 +4,7 @@ import './content.css'
 
 import injectEntryButton from './injectors/entry-injector'
 import initializeTreeSpace from './injectors/app-injector'
+import ConversationResponse from './models/conversation-response'
 import logger from './logger'
 
 // handle the "enter tree view" button
@@ -26,7 +27,7 @@ setTimeout(() => {
 // --- Event Listeners (from Background Script) ---
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'render-tree') {
-        const treeResponse = request.treeResponse
+        const treeResponse = request.treeResponse as ConversationResponse
         const mapping = treeResponse.mapping
         const currentNodeId = treeResponse.current_node
 

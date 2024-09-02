@@ -10,8 +10,8 @@ const config = (env, argv) =>
     merge(common, {
         entry: {
             popup: PATHS.src + '/popup.js',
-            content: PATHS.src + '/content.js',
-            background: PATHS.src + '/background.js',
+            content: PATHS.src + '/content.ts',
+            background: PATHS.src + '/background.ts',
         },
         devtool: argv.mode === 'production' ? false : 'source-map',
         module: {
@@ -24,14 +24,22 @@ const config = (env, argv) =>
                     },
                 },
                 {
+                    test: /\.tsx?$/,
+                    exclude: /node_modules/,
+                    use: {
+                        loader: 'ts-loader',
+                    },
+                },
+                {
                     test: /\.css$/,
                     use: ['style-loader', 'css-loader', 'postcss-loader'],
                 },
             ],
         },
         resolve: {
-            extensions: ['.js', '.jsx'],
+            extensions: ['.js', '.ts', '.tsx'],
         },
+        devtool: argv.mode === 'production' ? false : 'source-map',
     })
 
 module.exports = config

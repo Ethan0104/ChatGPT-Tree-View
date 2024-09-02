@@ -1,13 +1,9 @@
 'use strict'
 
-import {
-    CHATGPT_DOMAIN,
-    CONVERSATION_ENDPOINT,
-} from './constants/network'
+import { CHATGPT_DOMAIN } from './constants/network'
 import { captureRequestParams, extractConvoIdFromUrl } from './utils/network'
-import { fetchConversationHistory, requestReplyForUser } from './api/chatgpt-api'
+import { fetchConversationHistory } from './api/chatgpt-api'
 import logger from './logger'
-
 
 // --- Event Listeners (from Content Script) ---
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -17,26 +13,31 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             async function (tabs) {
                 const activeTab = tabs[0]
                 const url = activeTab.url
+                if (!activeTab.id) {
+                    return
+                }
 
                 const conversationId = extractConvoIdFromUrl(url)
                 try {
                     const treeResponse = await fetchConversationHistory(
                         conversationId
                     )
-                    
+
                     // send message to content script to open the tree view
                     chrome.tabs.sendMessage(activeTab.id, {
                         action: 'render-tree',
                         treeResponse: treeResponse,
                     })
                 } catch (error) {
+                    const errorMessage =
+                        error instanceof Error ? error.message : 'Unknown error'
                     logger.error(
                         'Failed to retrieve tree response, reason: ',
-                        error.message
+                        errorMessage
                     )
                     chrome.tabs.sendMessage(activeTab.id, {
                         action: 'tree-fetch-failed',
-                        error: error.message,
+                        error: errorMessage,
                     })
                 }
             }
@@ -49,15 +50,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
     (details) => {
         captureRequestParams(details)
     },
-    { urls: ['<all_urls>'] },
-    ['requestHeaders']
-)
-
-chrome.webRequest.onBeforeSendHeaders.addListener(
-    (details) => {
-        console.log(details)
-    },
-    { urls: [`${CHATGPT_DOMAIN}${CONVERSATION_ENDPOINT}/*-*-*-*-*`] },
+    { urls: [`${CHATGPT_DOMAIN}/*`] },
     ['requestHeaders']
 )
 

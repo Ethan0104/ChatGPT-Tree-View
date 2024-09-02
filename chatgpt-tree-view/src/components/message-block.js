@@ -27,16 +27,6 @@ const SingularMessageDisplay = ({ message, isUser, editing }) => {
         content = ''
     }
 
-    // make the cursor focused on the user message display when editing is true
-    // useEffect(() => {
-    //     console.log("???", editorRef)
-    //     if (editing) {
-    //         // focus on the editor
-    //         // editorRef.current.focus()
-    //         editorRef.current.click()
-    //     }
-    // }, [editing])
-
     return (
         <div
             className="w-full mx-auto flex flex-1 gap-4 text-base bg-dark-textChunkBackground p-4 md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] max-h-[50rem] overflow-auto hover:overflow-y-scroll rounded-md overscroll-contain"
