@@ -2,8 +2,8 @@ const logger = {
     info: function () {
         console.log('[INFO] ChatGPT TreeView: ', ...arguments)
     },
-    error: (msg, error) => {
-        console.error('[ERROR] ChatGPT TreeView: ', msg, error)
+    error: function () {
+        console.error('[ERROR] ChatGPT TreeView: ', ...arguments)
     },
     debug: function () {
         console.log('[DEBUG] ChatGPT TreeView: ', ...arguments)

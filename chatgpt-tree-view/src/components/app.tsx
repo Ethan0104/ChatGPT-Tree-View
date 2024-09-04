@@ -5,8 +5,13 @@ import Canvas from './canvas'
 import { TreeProvider } from '../providers/tree-provider'
 import { LayoutProvider } from '../providers/layout-provider'
 import TreeContainer from './tree-container'
+import ConvoTree from '../models/convo-tree'
 
-const App = ({ convoTree }) => {
+interface AppProps {
+    convoTree: ConvoTree
+}
+
+const App: React.FC<AppProps> = ({ convoTree }) => {
     console.log('app is re-rendering')
     return (
         <TreeProvider convoTree={convoTree}>

@@ -31,7 +31,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const mapping = treeResponse.mapping
         const currentNodeId = treeResponse.current_node
 
-        initializeTreeSpace(mapping, currentNodeId)
+        // initializeTreeSpace(mapping, currentNodeId)
+        initializeTreeSpace(treeResponse)
     } else if (request.action === 'tree-fetch-failed') {
         logger.error('Failed to fetch tree', request.error)
     }

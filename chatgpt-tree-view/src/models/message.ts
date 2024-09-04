@@ -1,6 +1,7 @@
-import Author from "./author"
-import { Content } from "./content"
-import ModelSlug from "./model-slug"
+import { FileAttachment, ImageAttachment } from './attachment'
+import Author from './author'
+import { Content } from './content'
+import ModelSlug from './model-slug'
 
 interface Message {
     id: string
@@ -8,8 +9,9 @@ interface Message {
     children: Message[]
 
     author: Author
-    modelSlug: ModelSlug | null  // null if it is a user message
+    modelSlug: ModelSlug | null // null if it is a user message
     content: Content
+    attachments: (FileAttachment | ImageAttachment)[]
 }
 
 export default Message
