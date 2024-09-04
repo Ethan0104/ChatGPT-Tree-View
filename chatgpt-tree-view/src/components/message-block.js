@@ -4,7 +4,7 @@ import { MilkdownProvider } from '@milkdown/react'
 import MilkdownEditor from './editor'
 import { useTreeContext } from '../providers/tree-provider'
 import { useLayoutContext } from '../providers/layout-provider'
-import { useCanvasContext } from '../providers/canvas-provider'
+import { useCanvasContext } from '../providers/canvas-provider.tsx'
 import {
     UserLogo,
     AssistantLogo,

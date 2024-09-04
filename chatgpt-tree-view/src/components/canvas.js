@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback } from 'react'
 
-import { useCanvasContext } from '../providers/canvas-provider'
+import { useCanvasContext } from '../providers/canvas-provider.tsx'
 
 const PAN_INTENSITY = 2
 const ZOOM_INTENSITY = 0.06
@@ -162,7 +162,7 @@ const Canvas = ({ children }) => {
                 // Prevent default behavior only if no scrollable parent is found
                 if (
                     scrollableParent &&
-                    scrollableParent.getAttribute('name') ==
+                    scrollableParent.getAttribute('data-name') ==
                         'singular-message-display' &&
                     event.wheelDeltaY !== 0 &&
                     isPanning === false

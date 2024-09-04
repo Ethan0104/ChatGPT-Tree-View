@@ -73,7 +73,7 @@ const filterHiddenEntries = (mapping: RawMapping) => {
                     childEntry.parent = parentId
                     mapping[parentId].children.push(childId)
                 }
-                
+
                 // remove the entry from the mapping
                 delete mapping[entryId]
             }

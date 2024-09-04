@@ -1,8 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react'
 
-const PillButton = ({ onClick, text, isPrimary }) => {
-    const [hovered, setHovered] = useState(false)
-    const buttonRef = useRef(null)
+interface PillButtonProps {
+    onClick?: () => void
+    text: string
+    isPrimary?: boolean
+}
+
+const PillButton: React.FC<PillButtonProps> = ({ onClick, text, isPrimary }) => {
+    const [hovered, setHovered] = useState<boolean>(false)
+    const buttonRef = useRef<HTMLDivElement>(null)
 
     const handleMouseEnter = () => {
         setHovered(true)
@@ -13,7 +19,9 @@ const PillButton = ({ onClick, text, isPrimary }) => {
     }
 
     useEffect(() => {
-        buttonRef.current.style.cursor = hovered ? 'pointer' : 'default'
+        if (buttonRef.current) {
+            buttonRef.current.style.cursor = hovered ? 'pointer' : 'default'
+        }
     }, [hovered])
 
     const btnClass = isPrimary ? 'btn-primary' : 'btn-secondary'
