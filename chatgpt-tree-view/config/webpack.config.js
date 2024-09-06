@@ -10,7 +10,7 @@ const path = require('path')
 const config = (env, argv) =>
     merge(common, {
         entry: {
-            popup: PATHS.src + '/popup.js',
+            popup: PATHS.src + '/popup.ts',
             content: PATHS.src + '/content.ts',
             background: PATHS.src + '/background.ts',
         },
@@ -23,7 +23,10 @@ const config = (env, argv) =>
                     use: {
                         loader: 'babel-loader',
                         options: {
-                            presets: ['@babel/preset-env', '@babel/preset-react'],
+                            presets: [
+                                '@babel/preset-env',
+                                '@babel/preset-react',
+                            ],
                         },
                     },
                 },
@@ -44,11 +47,23 @@ const config = (env, argv) =>
             extensions: ['.js', '.ts', '.tsx'],
             alias: {
                 // Dirty fix, why? https://chatgpt.com/share/0396f280-d37c-4908-92cf-36984607ed1d
-                '@milkdown/react': path.resolve(__dirname, '../node_modules/@milkdown/react/lib/index.es.js'),
-                '@milkdown/theme-nord': path.resolve(__dirname, '../node_modules/@milkdown/theme-nord/lib/index.es.js'),
-                '@milkdown/kit/core': path.resolve(__dirname, '../node_modules/@milkdown/kit/lib/core.js'),
-                '@milkdown/kit/preset/commonmark': path.resolve(__dirname, '../node_modules/@milkdown/kit/lib/preset/commonmark.js'),
-            },            
+                '@milkdown/react': path.resolve(
+                    __dirname,
+                    '../node_modules/@milkdown/react/lib/index.es.js'
+                ),
+                '@milkdown/theme-nord': path.resolve(
+                    __dirname,
+                    '../node_modules/@milkdown/theme-nord/lib/index.es.js'
+                ),
+                '@milkdown/kit/core': path.resolve(
+                    __dirname,
+                    '../node_modules/@milkdown/kit/lib/core.js'
+                ),
+                '@milkdown/kit/preset/commonmark': path.resolve(
+                    __dirname,
+                    '../node_modules/@milkdown/kit/lib/preset/commonmark.js'
+                ),
+            },
         },
         devtool: argv.mode === 'production' ? false : 'source-map',
         output: {

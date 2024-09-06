@@ -17,4 +17,4 @@ interface RawAuthor {
     name: RawAuthorName
 }
 
-export { RawAuthor, RawAuthorRole, RawAuthorName }
+export { RawAuthor, RawAuthorName, RawAuthorRole }

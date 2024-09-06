@@ -1,16 +1,16 @@
 import logger from '../logger'
-import { RawAuthorRole } from '../models/raw-author'
+import Author from '../models/author'
+import { Chunk } from '../models/content'
+import ConversationResponse from '../models/conversation-response'
+import ConvoTree from '../models/convo-tree'
 import Message from '../models/message'
+import { RawAuthorRole } from '../models/raw-author'
 import {
     MultimodalContent,
     RawContentType,
     TextContent,
 } from '../models/raw-content'
 import RawMessage from '../models/raw-message'
-import Author from '../models/author'
-import { Chunk } from '../models/content'
-import ConversationResponse from '../models/conversation-response'
-import ConvoTree from '../models/convo-tree'
 
 import {
     AssistantBranchIsNonLinearError,
@@ -19,10 +19,10 @@ import {
     NoAssistantMessageInRawMessageListError,
     NoModelSlugInAssistantMessageError,
 } from '../errors/tree'
-import RawMapping from '../models/raw-mapping'
-import RawEntry from '../models/raw-entry'
-import { filterHiddenEntries } from './preprocessing'
 import { FileAttachment, ImageAttachment } from '../models/attachment'
+import RawEntry from '../models/raw-entry'
+import RawMapping from '../models/raw-mapping'
+import { filterHiddenEntries } from './preprocessing'
 
 const parse = (response: ConversationResponse): ConvoTree => {
     /**

@@ -14,7 +14,4 @@ interface ResultTreeData {
     children: ResultTreeData[]
 }
 
-export {
-    TreeData,
-    ResultTreeData,
-}
+export { ResultTreeData, TreeData }

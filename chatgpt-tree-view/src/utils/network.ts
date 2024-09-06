@@ -1,7 +1,7 @@
 import {
+    AUTHORIZATION_HEADER_NAME,
     CHATGPT_DOMAIN,
     CHATGPT_OLD_DOMAIN,
-    AUTHORIZATION_HEADER_NAME,
     OAI_DEVICE_ID_HEADER_NAME,
     OAI_LANGUAGE_HEADER_NAME,
 } from '../constants/network'
@@ -15,7 +15,9 @@ export const checkDomain = (url: string) => {
     return url.startsWith(CHATGPT_DOMAIN) || url.startsWith(CHATGPT_OLD_DOMAIN)
 }
 
-export const captureRequestParams = (details: chrome.webRequest.WebRequestHeadersDetails) => {
+export const captureRequestParams = (
+    details: chrome.webRequest.WebRequestHeadersDetails
+) => {
     try {
         const headers = details.requestHeaders
         if (!headers) {

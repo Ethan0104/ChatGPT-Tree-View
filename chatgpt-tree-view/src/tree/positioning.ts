@@ -1,12 +1,15 @@
 import { BoundingBox, Layout } from 'non-layered-tidy-tree-layout'
-import { TreeData, ResultTreeData } from '../models/tree-data'
-import { SIBLING_SEPARATION, LEVEL_SEPARATION } from '../constants/treeLayout'
+import { LEVEL_SEPARATION, SIBLING_SEPARATION } from '../constants/treeLayout'
+import logger from '../logger'
 import ConvoTree from '../models/convo-tree'
 import Message from '../models/message'
+import { ResultTreeData, TreeData } from '../models/tree-data'
 import Vector from '../models/vector'
-import logger from '../logger'
 
-const positionConvoTree = (convoTree: ConvoTree, dimensions: Record<string, Vector>): Record<string, Vector> => {
+const positionConvoTree = (
+    convoTree: ConvoTree,
+    dimensions: Record<string, Vector>
+): Record<string, Vector> => {
     logger.debug('old dimensions:', dimensions)
     const bb = new BoundingBox(SIBLING_SEPARATION, LEVEL_SEPARATION)
     const layout = new Layout(bb)
@@ -17,16 +20,21 @@ const positionConvoTree = (convoTree: ConvoTree, dimensions: Record<string, Vect
     return treeResultToPositions(result)
 }
 
-const convoTreeToTreeData = (convoTree: ConvoTree, dimensions: Record<string, Vector>): TreeData => {
+const convoTreeToTreeData = (
+    convoTree: ConvoTree,
+    dimensions: Record<string, Vector>
+): TreeData => {
     const treeData: TreeData = {
-        id: "fake root", // to handle the multi-root ConvoTree
+        id: 'fake root', // to handle the multi-root ConvoTree
         width: 1,
         height: 1,
         children: [],
     }
 
     const traverse = (node: Message): TreeData => {
-        const children: TreeData[] = node.children.map((child) => traverse(child))
+        const children: TreeData[] = node.children.map((child) =>
+            traverse(child)
+        )
         const nodeData: TreeData = {
             id: node.id,
             width: dimensions[node.id].x,
@@ -43,11 +51,13 @@ const convoTreeToTreeData = (convoTree: ConvoTree, dimensions: Record<string, Ve
     return treeData
 }
 
-const treeResultToPositions = (result: ResultTreeData): Record<string, Vector> => {
+const treeResultToPositions = (
+    result: ResultTreeData
+): Record<string, Vector> => {
     const positions: Record<string, Vector> = {}
 
     const traverse = (node: ResultTreeData) => {
-        if (node.id !== "fake root") {
+        if (node.id !== 'fake root') {
             positions[node.id] = { x: node.x, y: node.y }
         }
         node.children.forEach((child) => traverse(child))

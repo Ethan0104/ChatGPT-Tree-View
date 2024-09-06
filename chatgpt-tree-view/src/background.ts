@@ -1,9 +1,9 @@
 'use strict'
 
-import { CHATGPT_DOMAIN } from './constants/network'
-import { captureRequestParams, extractConvoIdFromUrl } from './utils/network'
 import { fetchConversationHistory } from './api/chatgpt-api'
+import { CHATGPT_DOMAIN } from './constants/network'
 import logger from './logger'
+import { captureRequestParams, extractConvoIdFromUrl } from './utils/network'
 
 // --- Event Listeners (from Content Script) ---
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

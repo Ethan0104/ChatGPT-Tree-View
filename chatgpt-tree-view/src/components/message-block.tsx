@@ -36,7 +36,6 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
     const blockRef = useRef<HTMLDivElement>(null)
     const [position, setPosition] = useState<Vector>({ x: 0, y: 0 })
     const [dimension, setDimension] = useState<Vector>({ x: 0, y: 0 })
-    // const dragStartPosRef = useRef<Vector>(null)
     const dragStartPosRef = useRef<Vector>({ x: 0, y: 0 })
     const [editing, setEditing] = useState<boolean>(false)
 
@@ -95,10 +94,6 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
     useEffect(() => {
         // the block's transform origin is 0 0 but our positions refer to the center
         if (containerRef.current) {
-            // const topLeftPos = {
-            //     x: position.x - dimension.x / 2,
-            //     y: position.y - dimension.y / 2,
-            // }
             const topLeftPos = {
                 x: position.x,
                 y: position.y,
@@ -191,8 +186,14 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
                         <PillButton text="Send" isPrimary />
                     </div>
                 )}
+
+                {!isUser && (
+                    <div className="flex justify-end">
+                        <PillButton text="Add Prompt" isPrimary />
+                    </div>
+                )}
             </div>
-            <div
+            {/* <div
                 className="w-12 absolute rounded-lg hover:bg-neutral-800 hover:opacity-80 p-1"
                 style={{
                     transform: `translate(${dimension.x}px, -${dimension.y}px)`,
@@ -202,7 +203,7 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
                 <div className="mx-auto my-3 flex justify-center items-center">
                     <PlusIcon />
                 </div>
-            </div>
+            </div> */}
         </div>
     )
 }

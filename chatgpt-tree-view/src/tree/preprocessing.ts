@@ -1,7 +1,7 @@
+import { RawAuthorName, RawAuthorRole } from '../models/raw-author'
+import { RawContentType } from '../models/raw-content'
 import RawEntry from '../models/raw-entry'
 import RawMapping from '../models/raw-mapping'
-import { RawAuthorRole, RawAuthorName } from '../models/raw-author'
-import { RawContentType } from '../models/raw-content'
 
 const isEntryHidden = (entry: RawEntry): boolean => {
     /**

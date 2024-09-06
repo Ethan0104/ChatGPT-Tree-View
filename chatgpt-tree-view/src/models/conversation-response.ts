@@ -1,5 +1,5 @@
-import RawMapping from './raw-mapping'
 import ModelSlug from './model-slug'
+import RawMapping from './raw-mapping'
 
 interface ConversationResponse {
     title: string

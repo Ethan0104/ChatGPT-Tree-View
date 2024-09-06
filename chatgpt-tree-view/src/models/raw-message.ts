@@ -1,11 +1,11 @@
 import { RawAuthor } from './raw-author'
 import {
-    TextContent,
-    MultimodalContent,
     CodeContent,
     ExecutionOutputContent,
     MemoryContent,
+    MultimodalContent,
     TetherQuoteContent,
+    TextContent,
 } from './raw-content'
 import { RawMetadata } from './raw-metadata'
 

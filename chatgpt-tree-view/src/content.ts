@@ -2,10 +2,10 @@
 
 import './content.css'
 
-import injectEntryButton from './injectors/entry-injector'
 import initializeTreeSpace from './injectors/app-injector'
-import ConversationResponse from './models/conversation-response'
+import injectEntryButton from './injectors/entry-injector'
 import logger from './logger'
+import ConversationResponse from './models/conversation-response'
 
 // handle the "enter tree view" button
 const observer = new MutationObserver((mutationsList, observer) => {

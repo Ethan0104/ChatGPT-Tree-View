@@ -25,4 +25,4 @@ interface Content {
     chunks: Chunk[]
 }
 
-export { FileId, TextPart, ImagePart, CodePart, Chunk, Content }
+export { Chunk, CodePart, Content, FileId, ImagePart, TextPart }
