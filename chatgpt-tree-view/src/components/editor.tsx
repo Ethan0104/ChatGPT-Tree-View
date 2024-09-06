@@ -9,7 +9,12 @@ import { commonmark } from '@milkdown/kit/preset/commonmark'
 import { nord } from '@milkdown/theme-nord'
 import { Milkdown, useEditor } from '@milkdown/react'
 
-const MilkdownEditor = ({ defaultValue, editing }) => {
+interface MilkdownEditorProps {
+    defaultValue: string
+    editing: boolean
+}
+
+const MilkdownEditor: React.FC<MilkdownEditorProps> = ({ defaultValue, editing }) => {
     const { get } = useEditor((root) =>
         Editor.make()
             .config(nord)

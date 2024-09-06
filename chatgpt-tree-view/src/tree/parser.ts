@@ -35,20 +35,16 @@ const parse = (response: ConversationResponse): ConvoTree => {
     // here begins the long process of turning the rawMapping into a tree with supernodes.
 
     // Step 1: Find the root entry (the one with no message and no parent)
-    logger.info('response', response)
     const rootEntry = findRootEntry(response.mapping)
-    logger.info('Found root entry:', JSON.stringify(rootEntry))
 
     // Step 2: Sanitize the mapping by removing hidden entries
     filterHiddenEntries(response.mapping)
-    logger.info('Found root entry:', JSON.stringify(rootEntry))
 
     // Step 3: parse the Message roots of the final tree (the second interface of the convo tree) first
     // the Message roots are the children of the root entry
     const roots = rootEntry.children.map((childId) =>
         recursiveEntryParser(childId, response.mapping, null)
     )
-    logger.info('Parsed roots:', roots)
 
     // Step 4: work on the O(1) interface of the convo tree
     const mapping: { [id: string]: Message } = {}

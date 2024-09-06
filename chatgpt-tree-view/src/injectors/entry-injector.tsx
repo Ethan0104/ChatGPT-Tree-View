@@ -15,7 +15,7 @@ const getTopRight2ButtonsFlexboxDiv = () => {
             'button[aria-label="New chat"]'
         )
         // pick the newChatButton with the higher x position
-        let newChatButton = null
+        let newChatButton: Element | null = null
         newChatButtons.forEach((button) => {
             if (!newChatButton) {
                 newChatButton = button
@@ -31,11 +31,11 @@ const getTopRight2ButtonsFlexboxDiv = () => {
         // set newChatButton to null if its x position is less than half of the viewport width
         if (
             newChatButton &&
-            newChatButton.getBoundingClientRect().x < window.innerWidth / 2
+            (newChatButton as Element).getBoundingClientRect().x < window.innerWidth / 2
         ) {
             newChatButton = null
         }
-        const smallViewDiv = newChatButton?.parentNode?.parentNode
+        const smallViewDiv = (newChatButton as unknown as Element)?.parentNode?.parentNode
         return largeViewDiv || smallViewDiv
     } catch (e) {
         return null

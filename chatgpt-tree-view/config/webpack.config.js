@@ -4,6 +4,7 @@ const { merge } = require('webpack-merge')
 
 const common = require('./webpack.common.js')
 const PATHS = require('./paths')
+const path = require('path')
 
 // Merge webpack configuration files
 const config = (env, argv) =>
@@ -21,6 +22,9 @@ const config = (env, argv) =>
                     exclude: /node_modules/,
                     use: {
                         loader: 'babel-loader',
+                        options: {
+                            presets: ['@babel/preset-env', '@babel/preset-react'],
+                        },
                     },
                 },
                 {
@@ -38,8 +42,19 @@ const config = (env, argv) =>
         },
         resolve: {
             extensions: ['.js', '.ts', '.tsx'],
+            alias: {
+                // Dirty fix, why? https://chatgpt.com/share/0396f280-d37c-4908-92cf-36984607ed1d
+                '@milkdown/react': path.resolve(__dirname, '../node_modules/@milkdown/react/lib/index.es.js'),
+                '@milkdown/theme-nord': path.resolve(__dirname, '../node_modules/@milkdown/theme-nord/lib/index.es.js'),
+                '@milkdown/kit/core': path.resolve(__dirname, '../node_modules/@milkdown/kit/lib/core.js'),
+                '@milkdown/kit/preset/commonmark': path.resolve(__dirname, '../node_modules/@milkdown/kit/lib/preset/commonmark.js'),
+            },            
         },
         devtool: argv.mode === 'production' ? false : 'source-map',
+        output: {
+            libraryTarget: 'umd',
+        },
+        target: 'web',
     })
 
 module.exports = config

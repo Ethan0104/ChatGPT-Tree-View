@@ -1,6 +1,6 @@
 import React from 'react'
 
-const TreeButton = () => (
+const TreeButton: React.FC = () => (
     <span data-state="closed" id="chatgpt-tree-view-enter-button">
         <button
             className="h-10 rounded-lg px-2 text-token-text-secondary focus-visible:outline-0 hover:bg-token-main-surface-secondary focus-visible:bg-token-main-surface-secondary"

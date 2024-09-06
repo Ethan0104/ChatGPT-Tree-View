@@ -13,11 +13,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             async function (tabs) {
                 const activeTab = tabs[0]
                 const url = activeTab.url
-                if (!activeTab.id) {
+                if (!activeTab.id || !url) {
                     return
                 }
 
                 const conversationId = extractConvoIdFromUrl(url)
+                if (!conversationId) {
+                    logger.error('Failed to extract conversation ID from URL')
+                    chrome.tabs.sendMessage(activeTab.id, {
+                        action: 'tree-fetch-failed',
+                        error: 'Failed to extract conversation ID from URL',
+                    })
+                    return
+                }
                 try {
                     const treeResponse = await fetchConversationHistory(
                         conversationId

@@ -1,7 +1,9 @@
 import React from 'react'
 import { getBoxToBoxArrow } from 'curved-arrows'
 
-const Arrow = ({ x0, y0, w0, h0, x1, y1, w1, h1 }) => {
+import ArrowParam from '../models/arrow-param'
+
+const Arrow: React.FC<ArrowParam> = ({ x0, y0, w0, h0, x1, y1, w1, h1 }) => {
     const arrowHeadSize = 9
     const strokeWidth = 2
     const color = 'white'
@@ -17,16 +19,18 @@ const Arrow = ({ x0, y0, w0, h0, x1, y1, w1, h1 }) => {
         {
             padStart: 0,
             padEnd: arrowHeadSize,
-            allowedStartSides: ['right'],
-            allowedEndSides: ['left'],
+            // allowedStartSides: ['right'],
+            // allowedEndSides: ['left'],
+            allowedStartSides: ['bottom'],
+            allowedEndSides: ['top'],
         }
     )
 
     // Calculate the bounding box for the arrow path
     const minX = Math.min(sx, c1x, c2x, ex) - arrowHeadSize
-    const maxX = Math.max(sx, c1x, c2x, ex) + arrowHeadSize * 2
+    const maxX = Math.max(sx, c1x, c2x, ex) + arrowHeadSize
     const minY = Math.min(sy, c1y, c2y, ey) - arrowHeadSize
-    const maxY = Math.max(sy, c1y, c2y, ey) + arrowHeadSize
+    const maxY = Math.max(sy, c1y, c2y, ey) + arrowHeadSize * 2
     const width = maxX - minX
     const height = maxY - minY
 

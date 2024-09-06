@@ -35,13 +35,23 @@ const TreeContainer: React.FC = () => {
                 postOrderTraversal(child)
 
                 // compute the arrow parameters
+                // const arrowParam = {
+                //     x0: positions[node.id].x - dimensions[node.id].x / 2,
+                //     y0: positions[node.id].y - dimensions[node.id].y / 2,
+                //     w0: dimensions[node.id].x,
+                //     h0: dimensions[node.id].y,
+                //     x1: positions[child.id].x - dimensions[child.id].x / 2,
+                //     y1: positions[child.id].y - dimensions[child.id].y / 2,
+                //     w1: dimensions[child.id].x,
+                //     h1: dimensions[child.id].y,
+                // }
                 const arrowParam = {
-                    x0: positions[node.id].x - dimensions[node.id].x / 2,
-                    y0: positions[node.id].y - dimensions[node.id].y / 2,
+                    x0: positions[node.id].x,
+                    y0: positions[node.id].y,
                     w0: dimensions[node.id].x,
                     h0: dimensions[node.id].y,
-                    x1: positions[child.id].x - dimensions[child.id].x / 2,
-                    y1: positions[child.id].y - dimensions[child.id].y / 2,
+                    x1: positions[child.id].x,
+                    y1: positions[child.id].y,
                     w1: dimensions[child.id].x,
                     h1: dimensions[child.id].y,
                 }

@@ -2,9 +2,9 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 
 import App from '../components/app'
-import ConvoTree from '../mapping/convo-tree'
 import parse from '../tree/parser'
 import logger from '../logger'
+import ConversationResponse from '../models/conversation-response'
 
 const primeExistingUI = () => {
     // hide all the conversation turns
@@ -12,11 +12,11 @@ const primeExistingUI = () => {
         "[data-testid^='conversation-turn-']"
     )
     convoTurns.forEach((turn) => {
-        turn.style.display = 'none'
+        (turn as HTMLElement).style.display = 'none'
     })
 
     // modify the parent div that will eventually hold the entire tree view
-    const convoTurnParent = convoTurns[0].parentNode
+    const convoTurnParent = convoTurns[0].parentNode as HTMLElement
     convoTurnParent.classList.add('h-full')
 
     // initialize the actual tree view by creating an root element that's on the same level as the conversation turns
@@ -28,18 +28,7 @@ const primeExistingUI = () => {
     return root
 }
 
-// const initializeTreeSpace = (mapping, currentNodeId) => {
-//     // get the root div that's obtained by priming the existing ChatGPT UI
-//     const root = primeExistingUI()
-
-//     // initialize the tree
-//     const convoTree = new ConvoTree(mapping, currentNodeId)
-
-//     const rootDiv = ReactDOM.createRoot(root)
-//     rootDiv.render(<App convoTree={convoTree} />)
-// }
-
-const initializeTreeSpace = (treeResponse) => {
+const initializeTreeSpace = (treeResponse: ConversationResponse) => {
     // get the root div that's obtained by priming the existing ChatGPT UI
     const root = primeExistingUI()
 

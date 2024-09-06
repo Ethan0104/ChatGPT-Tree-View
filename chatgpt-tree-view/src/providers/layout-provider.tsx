@@ -8,8 +8,10 @@ import React, {
 
 import { useTreeContext } from './tree-provider'
 // import reingoldTilford from '../mapping/reingold-tilford'
+import positionConvoTree from '../tree/positioning'
 import Vector from '../models/vector'
 import { getAllMessageIdsOfTree } from '../tree/traversal'
+import logger from '../logger'
 
 interface LayoutContextValue {
     positions: Record<string, Vector>
@@ -50,8 +52,10 @@ const LayoutProvider: React.FC<LayoutProviderProps> = ({ children }) => {
         }
         if (Object.keys(dimensions).length === messageIds.length) {
             // const newPositions = reingoldTilford(convoTree.roots, dimensions)
-            // setPositions(newPositions)
-            // setPositionsInitialized(true)
+            const newPositions = positionConvoTree(convoTree, dimensions)
+            logger.debug('New positions:', newPositions)
+            setPositions(newPositions)
+            setPositionsInitialized(true)
         }
     }, [dimensions, positionsInitialized, setPositionsInitialized])
 

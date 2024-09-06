@@ -36,7 +36,8 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
     const blockRef = useRef<HTMLDivElement>(null)
     const [position, setPosition] = useState<Vector>({ x: 0, y: 0 })
     const [dimension, setDimension] = useState<Vector>({ x: 0, y: 0 })
-    const dragStartPosRef = useRef<Vector>(null)
+    // const dragStartPosRef = useRef<Vector>(null)
+    const dragStartPosRef = useRef<Vector>({ x: 0, y: 0 })
     const [editing, setEditing] = useState<boolean>(false)
 
     const {
@@ -68,7 +69,6 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
             const resizeObserver = new ResizeObserver((entries) => {
                 for (let entry of entries) {
                     // should really only be one entry but this is more robust
-                    logger.debug('entry target', entry.target)
                     // @ts-expect-error
                     const { offsetWidth, offsetHeight } = entry.target
                     const newDimension = {
@@ -95,9 +95,13 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
     useEffect(() => {
         // the block's transform origin is 0 0 but our positions refer to the center
         if (containerRef.current) {
+            // const topLeftPos = {
+            //     x: position.x - dimension.x / 2,
+            //     y: position.y - dimension.y / 2,
+            // }
             const topLeftPos = {
-                x: position.x - dimension.x / 2,
-                y: position.y - dimension.y / 2,
+                x: position.x,
+                y: position.y,
             }
             containerRef.current.style.transform = `translate(${topLeftPos.x}px, ${topLeftPos.y}px)`
         }    
@@ -161,6 +165,7 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
             }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            onMouseDown={handleDragStart}
             id={`tree-view-message-${id}`}
             ref={containerRef}
         >
@@ -169,7 +174,6 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
                 style={{
                     width: '40rem',
                 }}
-                onMouseDown={handleDragStart}
                 ref={blockRef}
             >
                 {
@@ -179,7 +183,6 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
                         <AssistantMessageMenu />
                     )
                 }
-                <UserMessageMenu />
                 <TextMessage text={text} isUser={isUser} editing={editing} />
 
                 {editing && (

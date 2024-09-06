@@ -34,4 +34,3 @@ const useTreeContext = (): TreeContextValue => {
 }
 
 export { TreeProvider, useTreeContext }
-

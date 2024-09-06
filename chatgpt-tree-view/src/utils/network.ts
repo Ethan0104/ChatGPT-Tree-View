@@ -7,17 +7,20 @@ import {
 } from '../constants/network'
 import logger from '../logger'
 
-export const extractConvoIdFromUrl = (url) => {
+export const extractConvoIdFromUrl = (url: string) => {
     return url.split('/').pop()
 }
 
-export const checkDomain = (url) => {
+export const checkDomain = (url: string) => {
     return url.startsWith(CHATGPT_DOMAIN) || url.startsWith(CHATGPT_OLD_DOMAIN)
 }
 
-export const captureRequestParams = (details) => {
+export const captureRequestParams = (details: chrome.webRequest.WebRequestHeadersDetails) => {
     try {
         const headers = details.requestHeaders
+        if (!headers) {
+            return
+        }
         const bearerHeader = headers.find(
             (header) => header.name === AUTHORIZATION_HEADER_NAME
         )
