@@ -165,7 +165,7 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
             ref={containerRef}
         >
             <div
-                className="flex flex-col gap-3 text-base py-[18px] px-4 border-2 bg-dark-blockBackground rounded-[36px] border-gray-200 shadow-xl shadow-dark-shadow cursor-grab"
+                className="flex flex-col gap-3 text-base py-[18px] px-4 border-2 bg-dark-blockBackground rounded-[36px] border-gray-200 shadow-xl tree-shadow-dark-shadow cursor-grab"
                 style={{
                     width: '40rem',
                 }}

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 
 import logger from '../logger'
 import TreeButton from '../components/tree-button'
+import App from '../components/app'
 
 const getTopRight2ButtonsFlexboxDiv = () => {
     try {
@@ -50,12 +51,12 @@ const injectEntryButton = async () => {
     const topRight2ButtonsFlexboxDiv = getTopRight2ButtonsFlexboxDiv()
     if (!topRight2ButtonsFlexboxDiv) {
         // wait a bit and try again, avoid running this function too frequently
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        // await new Promise((resolve) => setTimeout(resolve, 1000))
         return
     }
-    if (checkIfTreeButtonExists()) {
-        return
-    }
+    // if (checkIfTreeButtonExists()) {
+    //     return
+    // }
     const treeButtonContainer = document.createElement('div')
     topRight2ButtonsFlexboxDiv.insertBefore(
         treeButtonContainer,

@@ -1,4 +1,5 @@
 module.exports = {
+    prefix: 'tree-',
     content: [
         './src/*.{js,jsx,ts,tsx}',
         './src/**/*.{js,jsx,ts,tsx}',

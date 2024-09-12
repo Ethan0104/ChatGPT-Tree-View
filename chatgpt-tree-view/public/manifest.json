@@ -20,8 +20,8 @@
     "host_permissions": ["https://chatgpt.com/*", "https://chat.openai.com/*"],
     "content_scripts": [
         {
-            "matches": ["https://chatgpt.com/*", "https://chat.openai.com/*"],
-            "run_at": "document_end",
+            "matches": ["https://chatgpt.com/c/*", "https://chat.openai.com/c/*"],
+            "run_at": "document_idle",
             "js": ["content.js"]
         }
     ]

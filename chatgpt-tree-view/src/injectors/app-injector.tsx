@@ -28,16 +28,41 @@ const primeExistingUI = () => {
     return root
 }
 
-const initializeTreeSpace = (treeResponse: ConversationResponse) => {
-    // get the root div that's obtained by priming the existing ChatGPT UI
-    const root = primeExistingUI()
+// const initializeTreeSpace = (treeResponse: ConversationResponse) => {
+//     // get the root div that's obtained by priming the existing ChatGPT UI
+//     const root = primeExistingUI()
 
-    // initialize the tree
-    const convoTree = parse(treeResponse)
-    logger.info('ConvoTree:', convoTree)
+//     // initialize the tree
+//     const convoTree = parse(treeResponse)
+//     logger.info('ConvoTree:', convoTree)
 
-    const rootDiv = ReactDOM.createRoot(root)
-    rootDiv.render(<App convoTree={convoTree} />)
+//     const rootDiv = ReactDOM.createRoot(root)
+//     rootDiv.render(<App convoTree={convoTree} />)
+// }
+
+// export default initializeTreeSpace
+
+const getRootDiv = () => {
+    const convoTurns = document.querySelectorAll(
+        "[data-testid^='conversation-turn-']"
+    )
+    const convoTurnParent = convoTurns[0].parentNode as HTMLElement
+    // convoTurnParent.classList.add('h-full')
+
+    const root = document.createElement('div')
+    root.id = 'chatgpt-tree-view-root'
+    root.classList.add('h-full', 'flex-grow')
+    convoTurnParent.appendChild(root)
+
+    return root
 }
 
-export default initializeTreeSpace
+const injectApp = () => {
+    // get the root div that's obtained by priming the existing ChatGPT UI
+    const root = getRootDiv()
+
+    const rootDiv = ReactDOM.createRoot(root)
+    rootDiv.render(<App />)
+}
+
+export default injectApp
