@@ -10,13 +10,10 @@ const positionConvoTree = (
     convoTree: ConvoTree,
     dimensions: Record<string, Vector>
 ): Record<string, Vector> => {
-    logger.debug('old dimensions:', dimensions)
     const bb = new BoundingBox(SIBLING_SEPARATION, LEVEL_SEPARATION)
     const layout = new Layout(bb)
     const treeData = convoTreeToTreeData(convoTree, dimensions)
-    logger.debug('Tree data:', treeData)
     const { result } = layout.layout(treeData)
-    logger.debug('Result:', result)
     return treeResultToPositions(result)
 }
 

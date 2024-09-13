@@ -10,32 +10,26 @@ import logger from '../logger'
 import ConversationResponse from '../models/conversation-response'
 import parse from '../tree/parser'
 import showOrHideLinearMessages from '../manipulators/view-switcher'
+import { streamObserverStart } from '../observers/stream-observer'
 
 
 const App: React.FC = () => {
     const [convoTree, setConvoTree] = useState<ConvoTree | null>(null)
     const [inTreeView, setInTreeView] = useState<boolean>(false)
 
-    // return (
-    //     <TreeProvider convoTree={convoTree}>
-    //         <LayoutProvider>
-    //             {/* everything that's pannable/zoomable goes inside this canvas */}
-    //             <CanvasProvider>
-    //                 <Canvas>
-    //                     <TreeContainer />
-    //                 </Canvas>
-    //             </CanvasProvider>
+    // Set up necessary Observers
+    useEffect(() => {
+        streamObserverStart()
+    }, [])
 
-    //             {/* static things */}
-    //         </LayoutProvider>
-    //     </TreeProvider>
-    // )
-
+    // Register *chrome* event listener for messages from background script
     useEffect(() => {
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (request.action === 'render-tree') {
                 const treeResponse = request.treeResponse as ConversationResponse
-                setConvoTree(parse(treeResponse))
+                const parsedTree = parse(treeResponse)
+                logger.info('Parsed tree:', parsedTree)
+                setConvoTree(parsedTree)
                 showOrHideLinearMessages(false)
                 setInTreeView(true)
             } else if (request.action === 'tree-fetch-failed') {
@@ -43,7 +37,19 @@ const App: React.FC = () => {
             }
         })
     }, [])
-    
+
+    // Register *local* event listener for messages from observers
+    useEffect(() => {
+        const handleConvoTreeUpdated = () => {
+            logger.info('Assistant message finished, need to request for new tree now...')
+        }
+
+        window.addEventListener('assistant-message-finished', handleConvoTreeUpdated)
+        return () => {
+            window.removeEventListener('assistant-message-finished', handleConvoTreeUpdated)
+        }
+    }, [])
+
     return (
         <>
             {

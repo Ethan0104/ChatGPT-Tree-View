@@ -7,6 +7,7 @@ import { getAllMessages, getNodeCount } from '../tree/traversal'
 import ArrowParam from '../models/arrow-param'
 import Message from '../models/message'
 import MessageBlock from './message-block'
+import logger from '../logger'
 
 const TreeContainer: React.FC = () => {
     const { convoTree } = useTreeContext()

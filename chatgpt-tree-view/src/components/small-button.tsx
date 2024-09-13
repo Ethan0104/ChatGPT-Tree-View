@@ -24,7 +24,7 @@ const SmallButton: React.FC<SmallButtonProps> = ({ children }) => {
 
     return (
         <div
-            className="rounded-lg transition-all hover:bg-neutral-800 p-1"
+            className="rounded-lg tree-transition-all hover:tree-bg-neutral-800 p-1"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             ref={buttonRef}

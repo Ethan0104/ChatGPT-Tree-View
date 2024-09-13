@@ -7,11 +7,11 @@ import React, {
 } from 'react'
 
 import { useTreeContext } from './tree-provider'
-// import reingoldTilford from '../mapping/reingold-tilford'
 import positionConvoTree from '../tree/positioning'
 import Vector from '../models/vector'
 import { getAllMessageIdsOfTree } from '../tree/traversal'
 import logger from '../logger'
+import { LEVEL_SEPARATION } from '../constants/treeLayout'
 
 interface LayoutContextValue {
     positions: Record<string, Vector>
@@ -22,6 +22,7 @@ interface LayoutContextValue {
     setHighestZIndex: React.Dispatch<React.SetStateAction<number>>
     zIndices: Record<string, number>
     setZIndices: React.Dispatch<React.SetStateAction<Record<string, number>>>
+    addNewBlock: (parentId: string, newBlockId: string) => void
 }
 
 const LayoutContext = createContext<LayoutContextValue | undefined>(undefined)
@@ -51,7 +52,6 @@ const LayoutProvider: React.FC<LayoutProviderProps> = ({ children }) => {
             return
         }
         if (Object.keys(dimensions).length === messageIds.length) {
-            // const newPositions = reingoldTilford(convoTree.roots, dimensions)
             const newPositions = positionConvoTree(convoTree, dimensions)
             logger.debug('New positions:', newPositions)
             setPositions(newPositions)
@@ -59,23 +59,23 @@ const LayoutProvider: React.FC<LayoutProviderProps> = ({ children }) => {
         }
     }, [dimensions, positionsInitialized, setPositionsInitialized])
 
-    // const addNewBlock = useCallback(
-    //     (parentId, newBlockId) => {
-    //         const { x: parentX, y: parentY } = positions[parentId]
-    //         const { width: parentWidth, height: parentHeight } =
-    //             dimensions[parentId]
-    //         setPositions((prev) => {
-    //             return {
-    //                 ...prev,
-    //                 [newBlockId]: {
-    //                     x: parentX + parentWidth + LEVEL_SEPARATION,
-    //                     y: parentY,
-    //                 },
-    //             }
-    //         })
-    //     },
-    //     [positions, setPositions, dimensions]
-    // )
+    const addNewBlock = useCallback(
+        (parentId: string, newBlockId: string) => {
+            const { x: parentX, y: parentY } = positions[parentId]
+            const { x: parentWidth, y: parentHeight } =
+                dimensions[parentId]
+            setPositions((prev) => {
+                return {
+                    ...prev,
+                    [newBlockId]: {
+                        x: parentX,
+                        y: parentY + parentHeight + LEVEL_SEPARATION,
+                    },
+                }
+            })
+        },
+        [positions, setPositions, dimensions]
+    )
 
     return (
         <LayoutContext.Provider
@@ -88,6 +88,7 @@ const LayoutProvider: React.FC<LayoutProviderProps> = ({ children }) => {
                 setHighestZIndex,
                 zIndices,
                 setZIndices,
+                addNewBlock,
             }}
         >
             {children}

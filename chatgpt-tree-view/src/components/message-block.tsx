@@ -12,6 +12,7 @@ import { PillButton } from './buttons'
 import { PlusIcon } from './svgs'
 import Author from '../models/author'
 import logger from '../logger'
+import sendNewMessage from '../manipulators/message-sender'
 
 interface MessageBlockProps {
     message: Message
@@ -20,6 +21,7 @@ interface MessageBlockProps {
 const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
     const id = message.id
     const isUser = message.author === Author.USER
+    const isUnsentMessage = id.includes('-unsent')
     const messageChunks = message.content.chunks
     const text = messageChunks.reduce((accumulatedText, chunk) => {  // TODO: Fix this
         chunk.parts.forEach((part) => {
@@ -37,7 +39,7 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
     const [position, setPosition] = useState<Vector>({ x: 0, y: 0 })
     const [dimension, setDimension] = useState<Vector>({ x: 0, y: 0 })
     const dragStartPosRef = useRef<Vector>({ x: 0, y: 0 })
-    const [editing, setEditing] = useState<boolean>(false)
+    const [editing, setEditing] = useState<boolean>(isUnsentMessage)
 
     const {
         positions,
@@ -47,6 +49,7 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
         setHighestZIndex,
         zIndices,
         setZIndices,
+        addNewBlock,
     } = useLayoutContext()
     const { convoTree } = useTreeContext()
     const { scale } = useCanvasContext()
@@ -66,8 +69,8 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
         const block = blockRef.current
         if (block) {
             const resizeObserver = new ResizeObserver((entries) => {
+                // should really only be one entry but a for loop is more robust
                 for (let entry of entries) {
-                    // should really only be one entry but this is more robust
                     // @ts-expect-error
                     const { offsetWidth, offsetHeight } = entry.target
                     const newDimension = {
@@ -152,6 +155,43 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
         [setZIndices, zIndices, setHighestZIndex, handleDragMove, handleDragEnd]
     )
 
+    const updateMessageContent = (newContent: string) => {
+        const newChunks = [
+            {
+                id: id,
+                parts: [newContent],
+            },
+        ]
+        const newMessage = {
+            ...message,
+            content: {
+                chunks: newChunks,
+            },
+        }
+        convoTree.mapping[id] = newMessage
+    }
+
+    const handleAddNewPrompt = () => {
+        const newMsg = {
+            id: `${crypto.randomUUID()}-unsent`,
+            parent: message,
+            children: [],
+            author: Author.USER,
+            modelSlug: null,
+            content: {
+                chunks: [],
+            },
+            attachments: [],
+        }
+        message.children.push(newMsg)
+        convoTree.mapping[newMsg.id] = newMsg
+        addNewBlock(id, newMsg.id)
+    }
+
+    const handleSend = () => {
+        sendNewMessage(message.content.chunks[0].parts[0] as string)
+    }
+
     return (
         <div
             className="absolute"
@@ -165,7 +205,7 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
             ref={containerRef}
         >
             <div
-                className="flex flex-col gap-3 text-base py-[18px] px-4 border-2 bg-dark-blockBackground rounded-[36px] border-gray-200 shadow-xl tree-shadow-dark-shadow cursor-grab"
+                className="flex flex-col gap-3 text-base py-[18px] px-4 border-2 tree-bg-dark-blockBackground tree-rounded-[36px] tree-border-gray-200 shadow-xl tree-shadow-dark-shadow cursor-grab"
                 style={{
                     width: '40rem',
                 }}
@@ -178,18 +218,18 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
                         <AssistantMessageMenu />
                     )
                 }
-                <TextMessage text={text} isUser={isUser} editing={editing} />
+                <TextMessage text={text} isUser={isUser} editing={editing} reportContent={updateMessageContent} />
 
                 {editing && (
                     <div className="flex justify-end gap-2">
                         <PillButton text="Cancel" />
-                        <PillButton text="Send" isPrimary />
+                        <PillButton text="Send" onClick={handleSend} isPrimary />
                     </div>
                 )}
 
                 {!isUser && (
                     <div className="flex justify-end">
-                        <PillButton text="Add Prompt" isPrimary />
+                        <PillButton text="Add Prompt" onClick={handleAddNewPrompt} isPrimary />
                     </div>
                 )}
             </div>

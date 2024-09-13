@@ -43,10 +43,10 @@ const primeExistingUI = () => {
 // export default initializeTreeSpace
 
 const getRootDiv = () => {
-    const convoTurns = document.querySelectorAll(
+    const convoTurn = document.querySelector(
         "[data-testid^='conversation-turn-']"
     )
-    const convoTurnParent = convoTurns[0].parentNode as HTMLElement
+    const convoTurnParent = (convoTurn?.parentNode as HTMLElement) || (convoTurn?.parentElement as HTMLElement)
     // convoTurnParent.classList.add('h-full')
 
     const root = document.createElement('div')

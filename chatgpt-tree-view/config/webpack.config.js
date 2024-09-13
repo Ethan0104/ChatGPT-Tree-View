@@ -63,6 +63,10 @@ const config = (env, argv) =>
                     __dirname,
                     '../node_modules/@milkdown/kit/lib/preset/commonmark.js'
                 ),
+                '@milkdown/kit/plugin/listener': path.resolve(
+                    __dirname,
+                    '../node_modules/@milkdown/kit/lib/plugin/listener.js'
+                ),
             },
         },
         devtool: argv.mode === 'production' ? false : 'source-map',
