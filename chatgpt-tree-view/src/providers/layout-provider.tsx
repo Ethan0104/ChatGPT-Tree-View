@@ -32,7 +32,7 @@ interface LayoutProviderProps {
 }
 
 const LayoutProvider: React.FC<LayoutProviderProps> = ({ children }) => {
-    const { convoTree } = useTreeContext()
+    const { convoTree, setConvoTree } = useTreeContext()
     const messageIds = getAllMessageIdsOfTree(convoTree)
 
     const [positions, setPositions] = useState<Record<string, Vector>>({})
@@ -44,20 +44,27 @@ const LayoutProvider: React.FC<LayoutProviderProps> = ({ children }) => {
             return accumulatedObj
         }, {})
     )
-    const [positionsInitialized, setPositionsInitialized] = useState(false)
 
-    // initialize positions on startup
+    // initialize positions on startup and when the tree changes
     useEffect(() => {
-        if (positionsInitialized) {
-            return
-        }
         if (Object.keys(dimensions).length === messageIds.length) {
             const newPositions = positionConvoTree(convoTree, dimensions)
-            logger.debug('New positions:', newPositions)
             setPositions(newPositions)
-            setPositionsInitialized(true)
         }
-    }, [dimensions, positionsInitialized, setPositionsInitialized])
+    }, [convoTree, dimensions])
+
+    // listen for assistant message finished event to update the tree positions
+    useEffect(() => {
+        const handleConvoTreeUpdated = () => {
+            logger.info('Assistant message finished, need to request for new tree from background now...')
+            chrome.runtime.sendMessage({ action: 'request-tree' })
+        }
+
+        window.addEventListener('assistant-message-finished', handleConvoTreeUpdated)
+        return () => {
+            window.removeEventListener('assistant-message-finished', handleConvoTreeUpdated)
+        }
+    }, [])
 
     const addNewBlock = useCallback(
         (parentId: string, newBlockId: string) => {

@@ -30,8 +30,11 @@ const App: React.FC = () => {
                 const parsedTree = parse(treeResponse)
                 logger.info('Parsed tree:', parsedTree)
                 setConvoTree(parsedTree)
-                showOrHideLinearMessages(false)
-                setInTreeView(true)
+
+                if (!inTreeView) {
+                    setInTreeView(true)
+                    showOrHideLinearMessages(false)
+                }
             } else if (request.action === 'tree-fetch-failed') {
                 logger.error('Failed to fetch tree', request.error)
             }
@@ -54,7 +57,7 @@ const App: React.FC = () => {
         <>
             {
                 inTreeView && convoTree && (
-                    <TreeProvider convoTree={convoTree}>
+                    <TreeProvider convoTree={convoTree} setConvoTree={setConvoTree}>
                         <LayoutProvider>
                             {/* everything that's pannable/zoomable goes inside this canvas */}
                             <CanvasProvider>
