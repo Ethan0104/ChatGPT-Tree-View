@@ -1,6 +1,5 @@
 import { BoundingBox, Layout } from 'non-layered-tidy-tree-layout'
 import { LEVEL_SEPARATION, SIBLING_SEPARATION } from '../constants/treeLayout'
-import logger from '../logger'
 import ConvoTree from '../models/convo-tree'
 import Message from '../models/message'
 import { ResultTreeData, TreeData } from '../models/tree-data'

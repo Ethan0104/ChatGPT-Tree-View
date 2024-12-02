@@ -1,27 +1,30 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 
-import Message from '../models/message'
-import Vector from '../models/vector'
 import { useTreeContext } from '../providers/tree-provider'
 import { useLayoutContext } from '../providers/layout-provider'
 import { useCanvasContext } from '../providers/canvas-provider'
 import TextMessage from './text-message'
 import UserMessageMenu from './user-message-menu'
 import AssistantMessageMenu from './assistant-message-menu'
-import { PillButton } from './buttons'
+import { PillButton } from './pill-button'
 import { PlusIcon } from './svgs'
+import Message from '../models/message'
 import Author from '../models/author'
-import logger from '../logger'
+import Vector from '../models/vector'
 import sendNewMessage from '../manipulators/message-sender'
+import { isMessageInCurrentBranch } from '../tree/traversal'
+import logger from '../logger'
 
 interface MessageBlockProps {
     message: Message
 }
 
 const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
+    // BIG PROBLEM: MessageBlock always gets re-rendered whenever the user pans or zooms canvas
+    logger.info(`MessageBlock ${message.id} re-rendered at time ${new Date().getTime()}`)
+
     const id = message.id
     const isUser = message.author === Author.USER
-    const isUnsentMessage = id.includes('-unsent')
     const messageChunks = message.content.chunks
     const text = messageChunks.reduce((accumulatedText, chunk) => {  // TODO: Fix this
         chunk.parts.forEach((part) => {
@@ -39,7 +42,6 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
     const [position, setPosition] = useState<Vector>({ x: 0, y: 0 })
     const [dimension, setDimension] = useState<Vector>({ x: 0, y: 0 })
     const dragStartPosRef = useRef<Vector>({ x: 0, y: 0 })
-    const [editing, setEditing] = useState<boolean>(isUnsentMessage)
 
     const {
         positions,
@@ -51,8 +53,11 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
         setZIndices,
         addNewBlock,
     } = useLayoutContext()
-    const { convoTree } = useTreeContext()
     const { scale } = useCanvasContext()
+    const { convoTree } = useTreeContext()
+    const inCurrentBranch = isMessageInCurrentBranch(convoTree, message)
+    const borderColorClass = inCurrentBranch ? 'tree-border-dark-primary' : 'tree-border-gray-200'
+    const borderWeightClass = inCurrentBranch ? 'tree-border-4' : 'border-2'
 
     const [hovered, setHovered] = useState<boolean>(false)
 
@@ -171,27 +176,6 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
         convoTree.mapping[id] = newMessage
     }
 
-    const handleAddNewPrompt = () => {
-        const newMsg = {
-            id: `${crypto.randomUUID()}-unsent`,
-            parent: message,
-            children: [],
-            author: Author.USER,
-            modelSlug: null,
-            content: {
-                chunks: [],
-            },
-            attachments: [],
-        }
-        message.children.push(newMsg)
-        convoTree.mapping[newMsg.id] = newMsg
-        addNewBlock(id, newMsg.id)
-    }
-
-    const handleSend = () => {
-        sendNewMessage(message.content.chunks[0].parts[0] as string)
-    }
-
     return (
         <div
             className="absolute"
@@ -205,7 +189,7 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
             ref={containerRef}
         >
             <div
-                className="flex flex-col gap-3 text-base py-[18px] px-4 border-2 tree-bg-dark-blockBackground tree-rounded-[36px] tree-border-gray-200 shadow-xl tree-shadow-dark-shadow cursor-grab"
+                className={`flex flex-col gap-3 text-base py-[18px] px-4 ${borderWeightClass} tree-bg-dark-blockBackground tree-rounded-[36px] shadow-xl ${borderColorClass} tree-shadow-dark-shadow cursor-grab`}
                 style={{
                     width: '40rem',
                 }}
@@ -218,32 +202,8 @@ const MessageBlock: React.FC<MessageBlockProps> = ({ message }) => {
                         <AssistantMessageMenu />
                     )
                 }
-                <TextMessage text={text} isUser={isUser} editing={editing} reportContent={updateMessageContent} />
-
-                {editing && (
-                    <div className="flex justify-end gap-2">
-                        <PillButton text="Cancel" />
-                        <PillButton text="Send" onClick={handleSend} isPrimary />
-                    </div>
-                )}
-
-                {!isUser && (
-                    <div className="flex justify-end">
-                        <PillButton text="Add Prompt" onClick={handleAddNewPrompt} isPrimary />
-                    </div>
-                )}
+                <TextMessage text={text} isUser={isUser} editing={false} reportContent={updateMessageContent} />
             </div>
-            {/* <div
-                className="w-12 absolute rounded-lg hover:bg-neutral-800 hover:opacity-80 p-1"
-                style={{
-                    transform: `translate(${dimension.x}px, -${dimension.y}px)`,
-                    height: `${dimension.y}px`,
-                }}
-            >
-                <div className="mx-auto my-3 flex justify-center items-center">
-                    <PlusIcon />
-                </div>
-            </div> */}
         </div>
     )
 }

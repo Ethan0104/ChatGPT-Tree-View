@@ -1,17 +1,36 @@
-const showOrHideLinearMessages = (show: boolean) => {
-    // hide all the conversation turns
-    const convoTurns = document.querySelectorAll(
-        "[data-testid^='conversation-turn-']"
-    )
-    convoTurns.forEach((turn) => {
-        (turn as HTMLElement).style.display = show ? 'block' : 'none'
-    })
-    const convoTurnParent = convoTurns[0].parentNode as HTMLElement
-    if (show) {
-        convoTurnParent.classList.remove('h-full')
-    } else {
-        convoTurnParent.classList.add('h-full')
+import queryBottomInputBar from '../query/bottom-input-bar'
+import queryMainElement from '../query/main-element'
+
+const toTreeView = () => {
+    const root = document.querySelector(
+        '[id="chatgpt-tree-view-root"]'
+    ) as HTMLElement
+
+    if (!root) {
+        return
     }
+
+    root.style.visibility = 'visible'
+    root.style.pointerEvents = 'auto'
+
+    const mainElement = queryMainElement()
+    mainElement.style.visibility = 'hidden'
 }
 
-export default showOrHideLinearMessages
+const closeTreeView = () => {
+    const root = document.querySelector(
+        '[id="chatgpt-tree-view-root"]'
+    ) as HTMLElement
+
+    if (!root) {
+        return
+    }
+
+    root.style.visibility = 'hidden'
+    root.style.pointerEvents = 'none'
+
+    const mainElement = queryMainElement()
+    mainElement.style.visibility = 'visible'
+}
+
+export { closeTreeView, toTreeView }

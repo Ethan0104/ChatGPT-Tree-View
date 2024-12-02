@@ -3,10 +3,11 @@ import { getBoxToBoxArrow } from 'curved-arrows'
 
 import ArrowParam from '../models/arrow-param'
 
-const Arrow: React.FC<ArrowParam> = ({ x0, y0, w0, h0, x1, y1, w1, h1 }) => {
+const Arrow: React.FC<ArrowParam> = ({ x0, y0, w0, h0, x1, y1, w1, h1, isHighlighted }) => {
     const arrowHeadSize = 9
     const strokeWidth = 2
-    const color = 'white'
+    const strokeClass = isHighlighted ? 'tree-stroke-dark-primary' : 'tree-stroke-dark-arrowColor'
+    const fillClass = isHighlighted ? 'tree-fill-dark-primary' : 'tree-fill-dark-arrowColor'
     const [sx, sy, c1x, c1y, c2x, c2y, ex, ey, ae] = getBoxToBoxArrow(
         x0,
         y0,
@@ -19,8 +20,6 @@ const Arrow: React.FC<ArrowParam> = ({ x0, y0, w0, h0, x1, y1, w1, h1 }) => {
         {
             padStart: 0,
             padEnd: arrowHeadSize,
-            // allowedStartSides: ['right'],
-            // allowedEndSides: ['left'],
             allowedStartSides: ['bottom'],
             allowedEndSides: ['top'],
         }
@@ -49,7 +48,7 @@ const Arrow: React.FC<ArrowParam> = ({ x0, y0, w0, h0, x1, y1, w1, h1 }) => {
                 d={`M ${sx - minX} ${sy - minY} C ${c1x - minX} ${
                     c1y - minY
                 }, ${c2x - minX} ${c2y - minY}, ${ex - minX} ${ey - minY}`}
-                stroke={color}
+                className={strokeClass}
                 strokeWidth={strokeWidth}
                 fill="none"
             />
@@ -60,7 +59,7 @@ const Arrow: React.FC<ArrowParam> = ({ x0, y0, w0, h0, x1, y1, w1, h1 }) => {
                 transform={`translate(${ex - minX}, ${
                     ey - minY
                 }) rotate(${ae})`}
-                fill={color}
+                className={fillClass}
             />
         </svg>
     )

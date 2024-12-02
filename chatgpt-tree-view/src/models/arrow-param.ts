@@ -7,6 +7,7 @@ interface ArrowParam {
     y1: number
     w1: number
     h1: number
+    isHighlighted: boolean
 }
 
 export default ArrowParam

@@ -33,7 +33,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
                     // send message to content script to open the tree view
                     chrome.tabs.sendMessage(activeTab.id, {
-                        action: 'render-tree',
+                        action: 'register-updated-tree',
                         treeResponse: treeResponse,
                     })
                 } catch (error) {

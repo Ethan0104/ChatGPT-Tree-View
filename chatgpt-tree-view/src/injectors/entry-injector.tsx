@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 
 import logger from '../logger'
 import TreeButton from '../components/tree-button'
-import App from '../components/app'
 
 const getTopRight2ButtonsFlexboxDiv = () => {
     try {

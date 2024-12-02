@@ -6,7 +6,7 @@ const queryInputtablePromptField = (): HTMLTextAreaElement => {
      * @returns {HTMLTextAreaElement} The textarea element that holds the main prompt.
      * @throws {PromptInputFieldNotFoundError} If the prompt field is not found.
      */
-    const promptField = document.querySelector('[id="prompt-textarea"]')  // XYZ - prone to change
+    const promptField = document.querySelector('[id="prompt-textarea"]') // XYZ - prone to change
     if (!promptField) {
         throw new PromptInputFieldNotFoundError()
     }

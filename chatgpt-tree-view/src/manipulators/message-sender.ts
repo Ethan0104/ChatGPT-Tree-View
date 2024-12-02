@@ -1,7 +1,7 @@
-import queryInputtablePromptField from "../query/prompt-field"
-import { PromptInputFieldNotFoundError } from "../errors/dom"
-import querySendStopButton from "../query/send-stop"
-import logger from "../logger"
+import { PromptInputFieldNotFoundError } from '../errors/dom'
+import logger from '../logger'
+import queryInputtablePromptField from '../query/prompt-field'
+import querySendStopSpeechButton from '../query/send-stop'
 
 const sendNewMessage = (message: string) => {
     try {
@@ -13,17 +13,11 @@ const sendNewMessage = (message: string) => {
         const promptField = queryInputtablePromptField()
         promptField.innerHTML = `<p>${message}</p>` // XYZ - prone to change
 
-        const [sendStopButton] = querySendStopButton()
-        // log whether if the sendStopButton is disabled
-        // if (sendStopButton.disabled) {
-        //     console.warn('Send button is disabled. This implies some flakey behavior of the ChatGPT UI itself, because this button should always be enabled.')
-        // } else {
-        //     console.info('Send button is enabled.')
-        // }
-        // sendStopButton.click()
+        let sendStopButton = null
 
         // poll for the sendStopButton to be enabled
         const interval = setInterval(() => {
+            sendStopButton = querySendStopSpeechButton()[0]
             if (!sendStopButton.disabled) {
                 sendStopButton.click()
                 clearInterval(interval)
@@ -31,7 +25,9 @@ const sendNewMessage = (message: string) => {
         }, 50)
     } catch (error) {
         if (error instanceof PromptInputFieldNotFoundError) {
-            logger.error('Prompt input field not found. This implies some flakey behavior of the ChatGPT UI itself, because this element should always exist.')
+            logger.error(
+                'Prompt input field not found. This implies some flakey behavior of the ChatGPT UI itself, because this element should always exist.'
+            )
         } else {
             logger.error('Error sending new message:', error)
             throw error

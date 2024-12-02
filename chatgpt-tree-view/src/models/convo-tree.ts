@@ -4,7 +4,7 @@ interface ConvoTree {
     // 2 APIs for getting nodes: mapping (O(1) access to any given node by id) and root (good for traversals)
     mapping: { [id: string]: Message }
     roots: Message[]
-    currentMessage: Message
+    currentBranch: string[]
 
     conversationId: string
     isArchived: boolean

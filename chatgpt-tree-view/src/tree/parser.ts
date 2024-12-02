@@ -54,11 +54,19 @@ const parse = (response: ConversationResponse): ConvoTree => {
     }
     roots.forEach((root) => traverse(root))
 
+    // Step 5: find the list of messages in the current branch
+    let currentBranch = [response.current_node]
+    let currentMessage = mapping[response.current_node]
+    while (currentMessage.parent) {
+        currentBranch.unshift(currentMessage.parent.id)
+        currentMessage = currentMessage.parent
+    }
+
     // Step 5: return the final ConvoTree object
     return {
         mapping,
         roots,
-        currentMessage: mapping[response.current_node],
+        currentBranch,
         conversationId: response.conversation_id,
         isArchived: response.is_archived,
         title: response.title,

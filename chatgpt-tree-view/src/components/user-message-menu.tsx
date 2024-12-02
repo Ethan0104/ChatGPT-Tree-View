@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { UserLogo, EditIcon, CopyIcon, TrashIcon } from './svgs'
+import { UserLogo, CopyIcon } from './svgs'
 import SmallButton from './small-button'
 
 const UserMessageMenu: React.FC = () => {
@@ -11,13 +11,7 @@ const UserMessageMenu: React.FC = () => {
             </div>
             <div className="flex justify-end gap-1">
                 <SmallButton>
-                    <EditIcon />
-                </SmallButton>
-                <SmallButton>
                     <CopyIcon />
-                </SmallButton>
-                <SmallButton>
-                    <TrashIcon />
                 </SmallButton>
             </div>
         </div>

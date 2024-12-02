@@ -30,3 +30,16 @@ export const getAllMessages = (tree: ConvoTree): Message[] => {
      */
     return Object.values(tree.mapping)
 }
+
+export const isMessageInCurrentBranch = (tree: ConvoTree, message: Message): boolean => {
+    /**
+     * Check if a message is in the current branch of the tree.
+     *
+     * @param tree - ConvoTree object
+     * @param message - Message object
+     * @returns True if the message is in the current branch, false otherwise
+     */
+    
+    // to do this, check if the input message is in the list of current branch messages
+    return tree.currentBranch.includes(message.id)
+}

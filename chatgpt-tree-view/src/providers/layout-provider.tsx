@@ -32,7 +32,7 @@ interface LayoutProviderProps {
 }
 
 const LayoutProvider: React.FC<LayoutProviderProps> = ({ children }) => {
-    const { convoTree, setConvoTree } = useTreeContext()
+    const { convoTree } = useTreeContext()
     const messageIds = getAllMessageIdsOfTree(convoTree)
 
     const [positions, setPositions] = useState<Record<string, Vector>>({})

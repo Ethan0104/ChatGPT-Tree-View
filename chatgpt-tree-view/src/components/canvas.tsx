@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useCallback } from 'react'
 
 import { useCanvasContext } from '../providers/canvas-provider'
+import logger from '../logger'
 
 const PAN_INTENSITY = 2
 const ZOOM_INTENSITY = 0.06
@@ -306,7 +307,7 @@ const Canvas: React.FC<CanvasProps> = ({ children }) => {
         canvas.addEventListener('mousedown', handleMouseDown)
         canvas.addEventListener('mouseup', handleMouseUp)
         canvas.addEventListener('mousemove', handleMouseMove)
-        canvas.addEventListener('wheel', handleWheel)
+        canvas.addEventListener('wheel', handleWheel, { capture: true, passive: false })
         canvas.addEventListener('mouseleave', handleMouseLeave)
         canvas.addEventListener('gesturestart', handleGestureStart)
         canvas.addEventListener('gesturechange', handleGestureChange)
@@ -340,8 +341,8 @@ const Canvas: React.FC<CanvasProps> = ({ children }) => {
     ])
 
     return (
-        <div className="canvas h-full" ref={canvasRef}>
-            <div className="parent h-full" ref={parentRef}>
+        <div className="canvas w-full h-full tree-top-0 tree-left-0 absolute" ref={canvasRef}>
+            <div className="parent w-full h-full" ref={parentRef}>
                 {children}
             </div>
         </div>
